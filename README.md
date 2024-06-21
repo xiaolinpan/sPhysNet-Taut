@@ -2,7 +2,7 @@
 
 Tautomeric equilibrium is pivotal in chemical and biological processes, influencing molecular stability, reactivity, biological activity, and ADME-Tox properties. Many drug-like molecules exist in multiple tautomeric states in aqueous solutions, making the rapid and accurate prediction of tautomer ratios and the the identification of major species essential for computational drug discovery. Over recent decades, numerous methods based on empirical rules and quantum mechanical (QM) calculations have been developed to predict tautomer ratios in various solvents. In this work, we present sPhysNet-siamese, a deep learning model fine-tuned on experimental data from a pre-trained model based on siamese network protocol, designed to predict tautomer ratios in aqueous solutions using MMFF94-optimized geometries directly. To train the pre-trained model, we create the Frag20-Taut dataset, calculated at the B3LYP/6-31G* level with the SMD solvation model, containing \~1 million molecular conformations with electronic energies in both gas and water phases. Our results demonstrate that sPhysNet-siamese excels in predicting tautomer ratios in aqueous solutions. On an experimental test set, sPhysNet-siamese surpasses all other methods, achieving state-of-the-art performance with an RMSE of 1.90 kcal/mol on the test set and an RMSE of 1.40 kcal/mol on the SAMPL2 challenge. Furthermore, we developed a user-friendly tool to predict stable tautomeric states in aqueous solutions, which enumerates all possible tautomeric states and ranks them using the sPhysNet-siamese model.
 
-![image](https://github.com/Xundrug/sPhysNet-Taut/blob/main/images/TOC.png)
+![image](https://github.com/xiaolinpan/sPhysNet-Taut/blob/main/images/TOC.png)
 
 
 ## Requirements
