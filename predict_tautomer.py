@@ -296,7 +296,7 @@ def run():
     parser.add_argument(
         '--output',
         type=str,
-        default="moltaut_output.sdf",
+        default="output.sdf",
         help='the output SDF file name')
 
     args = parser.parse_args()
