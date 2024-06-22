@@ -8,15 +8,15 @@ Tautomeric equilibrium is pivotal in chemical and biological processes, influenc
 
 ## Requirements
 
-* Python 3.6
+* Python
 * numpy
-* RDKit 2020.09.1.0
+* RDKit
 * scipy
-* pandas 0.25.3
-* pytorch 1.10.2
-* pytorch geometric 2.0.3
-* torch-scatter 2.0.9 
-* torch-sparse 0.6.12
+* pandas
+* pytorch
+* pytorch geometric
+* torch-scatter
+* torch-sparse
 
 ## Usage
 
