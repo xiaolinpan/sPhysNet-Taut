@@ -2,12 +2,8 @@
 
 ## Manifest
 
-* `aevs.py`: This script is to calculate atomic environment vectors using openbabel (AEVs).
-* `sasa.py`: It's a script to calculate atomic SASA by FreeSASA.
-* `descriptor.py`: Used to combine all atomic features and calculate atom type information.
-* `models.py`: The model of MolSolv, which is built by Pytorch and PyG.
+* `models.py`: The model of sPhysNet-siamese, which is built by Pytorch and PyG.
 * `gen_confs.py`: To generate molecular conformation by RDKit.
-* `optimize_mol.py`: To optimize molecular conformation by ANI-2x model.
 * `rank_tautomer.py`: Used to calculate internal energies and solvation energies to get the scores, then rank the tautomers by the scores.
 * `smirks_tansform_all.txt`: The SMIRTKS string for tautomer generation using RDKit reaction module.
 * `tautomer.py`: This script is used to generate tautomers for each molecule.
