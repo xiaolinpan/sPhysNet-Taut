@@ -52,6 +52,7 @@ python predict_tautomer.py --smi "Cc1c2c([nH]n1)OC(=C([C@@]2(c3cc(cc(c3)N4CCCC4)
 
 ## Citation
 If you use this project in your research, please cite the following papers:
+
 1.**MolGpka: A Web Server for Small Molecule pKa Prediction Using a Graph-Convolutional Neural Network**
 Authors: Xiaolin Pan, Hao wang, et al.
 Journal: JCIM
