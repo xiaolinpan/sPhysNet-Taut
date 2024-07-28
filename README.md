@@ -63,5 +63,5 @@ If you use this project in your research, please cite the following papers:
 
 ---
 <div align="center">
-    <img src="https://github.com/xiaolinpan/sPhysNet-Taut/blob/main/images/p6.png" alt="image" width="600"/>
+    <img src="https://github.com/xiaolinpan/sPhysNet-Taut/blob/main/images/p6.png" alt="image" width="800"/>
 </div>
