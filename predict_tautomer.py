@@ -284,6 +284,11 @@ def run():
         default=50,
         help='the number of conformation for solvation energy prediction')
     parser.add_argument(
+        '--taut_engine',
+        type=str,
+        default="rules",
+        help='the method for tautomer generation (rdkit or rules), you can choose rdkit or transformation rules as the engine')
+    parser.add_argument(
         '--ph',
         type=float,
         default=7.0,

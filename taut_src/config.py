@@ -16,4 +16,10 @@ model_paths = [ 'constraint_training_output/best_model1.pt',
 #               "v10_data_training_siamese/best_model4.pt",
 #               "v10_data_training_siamese/best_model5.pt"]
 
+model_paths = ["v17-data-v12/best_model1.pt",
+               "v17-data-v12/best_model2.pt",
+               "v17-data-v12/best_model3.pt",
+               "v17-data-v12/best_model4.pt",
+               "v17-data-v12/best_model5.pt"]
+
 model_paths = [os.path.join(rootp, "weights", path) for path in model_paths]
