@@ -53,6 +53,6 @@ python predict_tautomer.py --smi "Cc1c2c([nH]n1)OC(=C([C@@]2(c3cc(cc(c3)N4CCCC4)
 ## Citation
 If you use this project in your research, please cite the following papers:
 
-1.Pan, X., Wang, H., Li, C., Zhang, J. Z., & Ji, C. (2021). **MolGpka: A Web Server for Small Molecule pKa Prediction Using a Graph-Convolutional Neural Network** Journal of Chemical Information and Modeling, 61(7), 3159-3165.
+1. Pan, X., Wang, H., Li, C., Zhang, J. Z., & Ji, C. (2021). **MolGpka: A Web Server for Small Molecule pKa Prediction Using a Graph-Convolutional Neural Network** Journal of Chemical Information and Modeling, 61(7), 3159-3165.
  
 2. Pan, X., Zhao, F., Zhang, Y., Wang, X., Xiao, X., Zhang, J. Z., & Ji, C. (2023). **MolTaut: A Tool for the Rapid Generation of Favorable Tautomer in Aqueous Solution.** Journal of Chemical Information and Modeling, 63(7), 1833-1840.
