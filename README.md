@@ -49,3 +49,14 @@ These is a example for the MolTaut usage, the ligand is extracted from pdbid 5v7
 ```
 python predict_tautomer.py --smi "Cc1c2c([nH]n1)OC(=C([C@@]2(c3cc(cc(c3)N4CCCC4)C(F)(F)F)C(C)C)C#N)N"
 ```
+
+## Citation
+If you use this project in your research, please cite the following papers:
+1.**MolGpka: A Web Server for Small Molecule pKa Prediction Using a Graph-Convolutional Neural Network**
+Authors: Xiaolin Pan, Hao wang, et al.
+Journal: JCIM
+Year: 2021-07-12
+DOI: https://doi.org/10.1021/acs.jcim.1c00075
+ 
+2.
+3.
