@@ -58,3 +58,10 @@ If you use this project in your research, please cite the following papers:
 2. Pan, X., Zhao, F., Zhang, Y., Wang, X., Xiao, X., Zhang, J. Z., & Ji, C. (2023). **MolTaut: A Tool for the Rapid Generation of Favorable Tautomer in Aqueous Solution.** Journal of Chemical Information and Modeling, 63(7), 1833-1840.
 
 3. Dhaked, D. K., Ihlenfeldt, W. D., Patel, H., Delannée, V., & Nicklaus, M. C. (2020). **Toward a comprehensive treatment of tautomerism in chemoinformatics including in InChI V2.** Journal of chemical information and modeling, 60(3), 1253-1275.
+
+## Model architecture
+
+---
+<div align="center">
+    <img src="https://github.com/xiaolinpan/sPhysNet-Taut/blob/main/images/p6.png" alt="image" width="450"/>
+</div>
