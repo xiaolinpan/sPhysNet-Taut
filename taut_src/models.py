@@ -90,8 +90,8 @@ def load_model(model_path):
     
     siames_net = AveragedModel( siames_net )
     state_dict = torch.load(model_path, map_location=get_device())
-    state_dict = fix_model_keys( state_dict )
-    siames_net.module.load_state_dict(state_dict, strict=False)
+    # state_dict = fix_model_keys( state_dict )
+    siames_net.load_state_dict(state_dict)
     siames_net = siames_net.eval()
     return siames_net
 
