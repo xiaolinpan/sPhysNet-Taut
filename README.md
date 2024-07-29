@@ -11,15 +11,19 @@ Tautomerization plays a critical role in numerous chemical and biological proces
 
 ## Requirements
 
-* Python
-* numpy
-* RDKit
-* scipy
-* pandas
-* pytorch
-* pytorch geometric
-* torch-scatter
-* torch-sparse
+* Python 3.10.13
+* numpy 1.26.3
+* RDKit 2024.03.3
+* scipy 
+* pandas 2.1.4
+* pytorch 2.2.0
+* pytorch geometric 2.4.0
+* torch-scatter 2.1.2
+* torch-sparse 0.6.18
+* torch-cluster 1.6.3
+* torch-spline-conv 1.2.2
+* treelib 1.6.1
+* mols2grid 2.0.0
 
 ## Usage
 
