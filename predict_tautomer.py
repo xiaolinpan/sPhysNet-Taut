@@ -218,8 +218,6 @@ def write_file(datas, sdf_path):
             #mol.SetProp("Score", score)
             #mol.SetProp("Label", label)
             #conf_data.append([mol, cids])
-        
-
 
     sdw = Chem.SDWriter(sdf_path)
     for mol, cids in conf_data:
@@ -288,6 +286,12 @@ def run():
         type=str,
         default="rules",
         help='the method for tautomer generation (rdkit or rules), you can choose rdkit or transformation rules as the engine')
+    parser.add_argument(
+        '--ionization',
+        type=int,
+        default=True,
+        help='determine to generate ionization states by predicted pKa using the given pH'
+    )
     parser.add_argument(
         '--ph',
         type=float,
