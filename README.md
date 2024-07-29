@@ -24,16 +24,15 @@ Tautomerization plays a critical role in numerous chemical and biological proces
 ## Usage
 
 ```
-python predict_tautomer.py --help
-
 usage: predict_tautomer.py [-h] [--smi SMI]
                            [--low_energy_tautomer_cutoff LOW_ENERGY_TAUTOMER_CUTOFF]
-                           [--cutmol CUTMOL] [--num_confs NUM_CONFS] [--ph PH]
-                           [--tph TPH] [--output OUTPUT]
+                           [--cutmol CUTMOL] [--num_confs NUM_CONFS]
+                           [--ionization IONIZATION] [--ph PH] [--tph TPH]
+                           [--output OUTPUT]
 
 calculate low-energy tautomer for small molecules
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --smi SMI             the molecular smiles
   --low_energy_tautomer_cutoff LOW_ENERGY_TAUTOMER_CUTOFF
@@ -42,6 +41,9 @@ optional arguments:
   --num_confs NUM_CONFS
                         the number of conformation for solvation energy
                         prediction
+  --ionization IONIZATION
+                        determine to generate ionization states by predicted pKa
+                        using the given pH
   --ph PH               the target pH for protonation states generation
   --tph TPH             pH tolerance for protonation states generation
   --output OUTPUT       the output SDF file name
