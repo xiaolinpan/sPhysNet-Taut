@@ -165,7 +165,7 @@ def generate_tautomer_non_cutmol(mm, num_confs, energy_range):
     return dfs_res_lower, dfs_res_upper
 
 
-def func(smi, cutmol, energy_range=2.8, ph=7.0, tph=1.0, num_confs=3):
+def func(smi, cutmol, energy_range=2.8, ionization=True, ph=7.0, tph=1.0, num_confs=3):
     mm = Chem.MolFromSmiles(smi)
     mm = un.uncharge(mm)
     mm = Chem.MolFromSmiles(Chem.MolToSmiles(mm))
@@ -179,9 +179,10 @@ def func(smi, cutmol, energy_range=2.8, ph=7.0, tph=1.0, num_confs=3):
     else:
         dfs_res_lower, dfs_res_upper = generate_tautomer_non_cutmol(
             mm, energy_range=energy_range, num_confs=num_confs )
-    #dfs_res_lower[2] = dfs_res_lower[0].map(
-    #    lambda x: protonate_mol(x, ph, tph))
-    print(dfs_res_lower)
+    
+    if ionization:
+        dfs_res_lower[2] = dfs_res_lower[0].map(lambda x: protonate_mol(x, ph, tph))
+        # dfs_res_upper[2] = dfs_res_upper[0].map(lambda x: protonate_mol(x, ph, tph))
     return dfs_res_lower, dfs_res_upper
 
 
@@ -196,28 +197,30 @@ def generate_conf(smi):
     return mol, cids
 
 
-def write_file(datas, sdf_path):
+def write_file(datas, sdf_path, ionization):
     conf_data = []
     for data in datas:
         tsmi = data['tsmi']
-        #psmis = data['psmis']
+        psmis = data['psmis']
         score = data['score']
         label = data['label']
         if label == "high_energy":
             continue
-        mol, cids = generate_conf(tsmi)
-        mol.SetProp("tautomer smiles", tsmi)
-        mol.SetProp("Score", score)
-        mol.SetProp("Label", label)
-        conf_data.append([mol, cids])
-
-        #for smi in psmis:
-            #mol, cids = generate_conf(smi)
-            #mol.SetProp("tautomer smiles", tsmi)
-            #mol.SetProp("protonation smiles", smi)
-            #mol.SetProp("Score", score)
-            #mol.SetProp("Label", label)
-            #conf_data.append([mol, cids])
+       
+        if ionization:
+            for smi in psmis:
+                mol, cids = generate_conf(smi)
+                mol.SetProp("tautomer smiles", tsmi)
+                mol.SetProp("protonation smiles", smi)
+                mol.SetProp("Score", score)
+                mol.SetProp("Label", label)
+                conf_data.append([mol, cids])
+        else:
+            mol, cids = generate_conf(tsmi)
+            mol.SetProp("tautomer smiles", tsmi)
+            mol.SetProp("Score", score)
+            mol.SetProp("Label", label)
+            conf_data.append([mol, cids])
 
     sdw = Chem.SDWriter(sdf_path)
     for mol, cids in conf_data:
@@ -227,36 +230,41 @@ def write_file(datas, sdf_path):
     return
 
 
-def construct_data(dfs, label):
+def construct_data(dfs, label, ionization):
     datas = []
     for idx, row in dfs.iterrows():
         tsmi = row[0]
         score = row[1]
-        #psmis = row[2]
+        if ionization:
+            psmis = row[2]
 
         data = {}
         data['tsmi'] = tsmi
-        #data['psmis'] = psmis
+        if ionization:
+            data['psmis'] = psmis
         data['score'] = str(round(score, 2))
         data['label'] = label
         datas.append(data)
     return datas
 
 
-def get_taut_data(smi, cutmol, num_confs, energy_cutoff, ph, tph):
+def get_taut_data(smi, cutmol, num_confs, energy_cutoff, ionization, ph, tph):
     dfs_res_lower, dfs_res_upper = func(
         smi,
         cutmol=cutmol,
         energy_range=energy_cutoff,
         num_confs=num_confs,
+        ionization=ionization,
         ph=ph,
         tph=tph)
     datas_lower = construct_data(
         dfs_res_lower,
-        label="low_energy")
+        label="low_energy",
+        ionization=ionization)
     datas_upper = construct_data(
         dfs_res_upper,
-        label="high_energy")
+        label="high_energy",
+        ionization=ionization)
     fdatas = datas_lower + datas_upper
     return fdatas
 
@@ -281,11 +289,7 @@ def run():
         type=int,
         default=50,
         help='the number of conformation for solvation energy prediction')
-    parser.add_argument(
-        '--taut_engine',
-        type=str,
-        default="rules",
-        help='the method for tautomer generation (rdkit or rules), you can choose rdkit or transformation rules as the engine')
+    
     parser.add_argument(
         '--ionization',
         type=int,
@@ -314,13 +318,14 @@ def run():
     energy_cutoff = args.low_energy_tautomer_cutoff
     cutmol = args.cutmol
     num_confs = args.num_confs
+    ionization = args.ionization
     ph = args.ph
     tph = args.tph
     output = args.output
 
-    data = get_taut_data(smi, cutmol, num_confs, energy_cutoff, ph, tph)
+    data = get_taut_data(smi, cutmol, num_confs, energy_cutoff, ionization, ph, tph)
     print(data)
-    write_file(data, output)
+    write_file(data, output, ionization)
     return
 
 
