@@ -30,7 +30,7 @@ Tautomerization plays a critical role in numerous chemical and biological proces
 ```
 usage: predict_tautomer.py [-h] [--smi SMI]
                            [--low_energy_tautomer_cutoff LOW_ENERGY_TAUTOMER_CUTOFF]
-                           [--cutmol CUTMOL] [--num_confs NUM_CONFS]
+                           [--num_confs NUM_CONFS]
                            [--ionization IONIZATION] [--ph PH] [--tph TPH]
                            [--output OUTPUT]
 
