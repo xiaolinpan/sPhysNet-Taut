@@ -61,11 +61,13 @@ Or you can run it via jupyter notebook, the results will be shown by mols2grid w
 ## Citation
 If you use this project in your research, please cite the following papers:
 
-1. Pan, X., Wang, H., Li, C., Zhang, J. Z., & Ji, C. (2021). **MolGpka: A Web Server for Small Molecule pKa Prediction Using a Graph-Convolutional Neural Network** Journal of Chemical Information and Modeling, 61(7), 3159-3165.
- 
-2. Pan, X., Zhao, F., Zhang, Y., Wang, X., Xiao, X., Zhang, J. Z., & Ji, C. (2023). **MolTaut: A Tool for the Rapid Generation of Favorable Tautomer in Aqueous Solution.** Journal of Chemical Information and Modeling, 63(7), 1833-1840.
+1. Xia, S., Zhang, D., & Zhang, Y. (2023). **Multitask Deep Ensemble Prediction of Molecular Energetics in Solution: From Quantum Mechanics to Experimental Properties.** Journal of chemical theory and computation, 19(2), 659-668.
 
-3. Dhaked, D. K., Ihlenfeldt, W. D., Patel, H., Delannée, V., & Nicklaus, M. C. (2020). **Toward a comprehensive treatment of tautomerism in chemoinformatics including in InChI V2.** Journal of chemical information and modeling, 60(3), 1253-1275.
+2. Pan, X., Wang, H., Li, C., Zhang, J. Z., & Ji, C. (2021). **MolGpka: A Web Server for Small Molecule pKa Prediction Using a Graph-Convolutional Neural Network.** Journal of Chemical Information and Modeling, 61(7), 3159-3165.
+ 
+3. Pan, X., Zhao, F., Zhang, Y., Wang, X., Xiao, X., Zhang, J. Z., & Ji, C. (2023). **MolTaut: A Tool for the Rapid Generation of Favorable Tautomer in Aqueous Solution.** Journal of Chemical Information and Modeling, 63(7), 1833-1840.
+
+4. Dhaked, D. K., Ihlenfeldt, W. D., Patel, H., Delannée, V., & Nicklaus, M. C. (2020). **Toward a comprehensive treatment of tautomerism in chemoinformatics including in InChI V2.** Journal of chemical information and modeling, 60(3), 1253-1275.
 
 ## Model architecture
 
