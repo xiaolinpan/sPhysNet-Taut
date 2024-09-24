@@ -271,7 +271,7 @@ def get_taut_data(smi, cutmol, num_confs, energy_cutoff, ionization, ph, tph):
 
 def run():
     parser = argparse.ArgumentParser(
-        description='calculate low-energy tautomer for small molecules')
+        description='To calculate low-energy tautomeric states for small molecules by a deep learning model.')
     parser.add_argument(
         '--smi',
         type=str,

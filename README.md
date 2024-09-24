@@ -34,7 +34,7 @@ usage: predict_tautomer.py [-h] [--smi SMI]
                            [--ionization IONIZATION] [--ph PH] [--tph TPH]
                            [--output OUTPUT]
 
-calculate low-energy tautomer for small molecules
+To calculate low-energy tautomeric states for small molecules by a deep learning model.
 
 options:
   -h, --help            show this help message and exit
