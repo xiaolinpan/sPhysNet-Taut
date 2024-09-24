@@ -61,7 +61,7 @@ Or you can run it via jupyter notebook, the results will be shown by mols2grid w
 ## Citation
 If you use this project in your research, please cite the following papers:
 
-1. Xia, S., Zhang, D., & Zhang, Y. (2023). **Multitask Deep Ensemble Prediction of Molecular Energetics in Solution: From Quantum Mechanics to Experimental Properties.** Journal of chemical theory and computation, 19(2), 659-668.
+1. Xia, S., Zhang, D., & Zhang, Y. (2023). **Multitask Deep Ensemble Prediction of Molecular Energetics in Solution: From Quantum Mechanics to Experimental Properties.** Journal of Chemical Theory and Computation, 19(2), 659-668.
 
 2. Pan, X., Wang, H., Li, C., Zhang, J. Z., & Ji, C. (2021). **MolGpka: A Web Server for Small Molecule pKa Prediction Using a Graph-Convolutional Neural Network.** Journal of Chemical Information and Modeling, 61(7), 3159-3165.
  
