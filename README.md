@@ -41,7 +41,6 @@ options:
   --smi SMI             the molecular smiles
   --low_energy_tautomer_cutoff LOW_ENERGY_TAUTOMER_CUTOFF
                         the energy cutoff for low energy
-  --cutmol CUTMOL       determine to frag the molecule
   --num_confs NUM_CONFS
                         the number of conformation for solvation energy
                         prediction
