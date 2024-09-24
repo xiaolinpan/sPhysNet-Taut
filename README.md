@@ -53,11 +53,11 @@ options:
   --output OUTPUT       the output SDF file name
 
 ```
-These is a example for the MolTaut usage, the ligand is extracted from pdbid 5v7i:
+These is a example for the tautomeric states prediction:
 ```
 python predict_tautomer.py --smi "Cc1c2c([nH]n1)OC(=C([C@@]2(c3cc(cc(c3)N4CCCC4)C(F)(F)F)C(C)C)C#N)N"
 ```
-Or you can run MolTaut via jupyter notebook, the results will be shown by mols2grid with energies.
+Or you can run it via jupyter notebook, the results will be shown by mols2grid with energies.
 
 ## Citation
 If you use this project in your research, please cite the following papers:
