@@ -150,7 +150,6 @@ def generate_tautomer_cutmol(smi, num_confs, energy_range):
 def generate_tautomer_non_cutmol(mm, num_confs, energy_range):
     tauts = enumerate_tauts(mm)
     df_res = rank_tauts(tauts, num_confs, is_fragment=False)
-    print( df_res )
     df_res = df_res.iloc[:, [0, 1]]
     df_res.columns = [0, 1]
 

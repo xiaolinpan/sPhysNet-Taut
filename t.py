@@ -31,8 +31,8 @@ def modify_mol(mol, acid_dict, base_dict):
             at.SetProp("pKa", str(value))
         else:
             at.SetProp("ionization", "O")
+    #nmol = AllChem.RemoveHs(mol)
     return mol
-
 
 def get_pKa_data(mol, ph, tph):
     stable_data, unstable_data = [], []
@@ -107,7 +107,6 @@ def modify_stable_pka(new_mol, stable_data):
             new_mol = modify_base(at, new_mol)
     return new_mol
 
-
 def modify_unstable_pka(mol, unstable_data, i):
     combine_pka_datas = list(combinations(unstable_data, i))
     new_unsmis = []
@@ -125,7 +124,6 @@ def modify_unstable_pka(mol, unstable_data, i):
         smi = Chem.MolToSmiles(Chem.MolFromSmiles(Chem.MolToSmiles(new_mol)))
         new_unsmis.append(smi)
     return new_unsmis
-
 
 def protonate_mol(smi, ph, tph):
     omol = Chem.MolFromSmiles(smi)
@@ -156,8 +154,8 @@ if __name__=="__main__":
     mol = Chem.MolFromSmiles("CN(C)CCCN1C2=CC=CC=C2SC2=C1C=C(C=C2)C(C)=O")
     smi = "CN(C)CCCN1C2=CC=CC=C2SC2=C1C=C(C=C2)C(C)=O"
     smi = "Nc1cc(C(F)(F)F)c(-c2cc(N3CCCC3)nc(N3CCOCC3)n2)cn1"
-    smi = "O=C(O)c1cncc(O)n1"
-    smi = "O=C(O)c1cncc(=O)[nH]1"
+    #smi = "O=C(O)c1cncc(O)n1"
+    #smi = "O=C(O)c1cncc(=O)[nH]1"
     pt_smis = protonate_mol(smi, ph=7.0, tph=1.5)
     print(pt_smis)
 
