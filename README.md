@@ -79,5 +79,4 @@ If you use this project in your research, please cite the following papers:
 
 ## Notes
 
----
 The limitation of our model is that the performance of current model may decrease with increasing molecular size. Since the maximum number of heavy atoms in our DFT-calculated dataset is only 20, the model may not perform well with larger molecules.
