@@ -76,3 +76,8 @@ If you use this project in your research, please cite the following papers:
 <div align="center">
     <img src="https://github.com/xiaolinpan/sPhysNet-Taut/blob/main/images/p6.png" alt="image" width="800"/>
 </div>
+
+## Notes
+
+---
+The limitation of our model is that the performance of current model may decrease with increasing molecular size. Since the maximum number of heavy atoms in our DFT-calculated dataset is only 20, the model may not perform well with larger molecules.
