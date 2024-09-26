@@ -130,7 +130,7 @@ def modify_unstable_pka(mol, unstable_data, i):
 def protonate_mol(smi, ph, tph):
     omol = Chem.MolFromSmiles(smi)
     obase_dict, oacid_dict, omol = predict(omol)
-    print(oacid_dict)
+    #print(oacid_dict)
     mc = modify_mol(omol, oacid_dict, obase_dict)
     stable_data, unstable_data = get_pKa_data(mc, ph, tph)
     

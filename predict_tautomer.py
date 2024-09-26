@@ -281,7 +281,7 @@ def run():
         type=float,
         default=2.8,
         help='the energy cutoff for low energy')
-    parser.add_argument('--cutmol', type=int, default=True,
+    parser.add_argument('--cutmol', type=bool, default=True,
                         help='determine to frag the molecule')
     parser.add_argument(
         '--num_confs',
@@ -291,8 +291,8 @@ def run():
     
     parser.add_argument(
         '--ionization',
-        type=int,
-        default=True,
+        type=bool,
+        default=False,
         help='determine to generate ionization states by predicted pKa using the given pH'
     )
     parser.add_argument(
