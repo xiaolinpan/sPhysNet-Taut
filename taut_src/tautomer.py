@@ -45,18 +45,69 @@ def protect_atom(m):
 
 
 def protect_guanidine(mol):
-    pattern = Chem.MolFromSmarts("[#7]~[#6](~[#7])~[#7]")
+    pattern = Chem.MolFromSmarts("[#7;!R]~[#6;!R](~[#7;!R])~[#7;!R]")
     atom_idx = sum(mol.GetSubstructMatches(pattern), ())
     for at in mol.GetAtoms():
         if at.GetIdx() in atom_idx:
             at.SetProp('_protected', '1')
     return
-            
+
+
+def protect_amide(mol):
+    pattern = Chem.MolFromSmarts("[#7;!R]-[#6;!R]=[#8]")
+    atom_idx = sum(mol.GetSubstructMatches(pattern), ())
+    for at in mol.GetAtoms():
+        if at.GetIdx() in atom_idx:
+            at.SetProp('_protected', '1')
+    return
+
+
+def protect_nitro(mol):
+    pattern = Chem.MolFromSmarts("[#7](~[#8])~[#8]")
+    atom_idx = sum(mol.GetSubstructMatches(pattern), ())
+    for at in mol.GetAtoms():
+        if at.GetIdx() in atom_idx:
+            at.SetProp('_protected', '1')
+    return
+
+
+def protect_nitroso(mol):
+    pattern = Chem.MolFromSmarts("[#7]~[#8]")
+    atom_idx = sum(mol.GetSubstructMatches(pattern), ())
+    for at in mol.GetAtoms():
+        if at.GetIdx() in atom_idx:
+            at.SetProp('_protected', '1')
+    return
+
+
+def protect_phosphoric(mol):
+    pattern = Chem.MolFromSmarts("[#8]~[#15](~[#8])(~[#8])~[#8]")
+    atom_idx = sum(mol.GetSubstructMatches(pattern), ())
+    for at in mol.GetAtoms():
+        if at.GetIdx() in atom_idx:
+            at.SetProp('_protected', '1')
+    return
+
+
+def protect_anitro(mol):
+    pattern = Chem.MolFromSmarts("[#6]-[#6;!R]=[#7;!R]-[#6]")
+    res = [i[1:-1] for i in mol.GetSubstructMatches(pattern)]
+    atom_idx = sum(res, ())
+    for at in mol.GetAtoms():
+        if at.GetIdx() in atom_idx:
+            at.SetProp('_protected', '1')
+    return
 
 def get_tauts_by_smirks(mm, tauts_dict, kekulize=True):
     m = copy.deepcopy(mm)
     protect_atom(m)
     protect_guanidine(m)
+    protect_amide(m)
+    protect_nitro(m)
+    protect_nitroso(m)
+    protect_phosphoric(m)
+    protect_anitro(m)
+
     if kekulize:
         Chem.Kekulize(m, clearAromaticFlags=True)
 
@@ -116,8 +167,8 @@ def multi_kekulize(m, psmarts=["O=[N+]([O-])"]):
     mols = Chem.ResonanceMolSupplier(m, Chem.KEKULE_ALL)
     ms = []
     for m in mols:
-        if not filter_kekulize(m, patterns):
-            continue
+        # if not filter_kekulize(m, patterns):
+        #     continue
         smi = Chem.MolToSmiles(m, kekuleSmiles=True)
         nm = Chem.MolFromSmiles(smi, ps)
         ms.append(nm)
@@ -157,10 +208,13 @@ def get_tauts_by_dict(tauts_dict):
     all_tmols = get_mols_from_dict(tauts_dict)
     for tm in all_tmols:
         tm = Chem.AddHs(tm)
-        kms = multi_kekulize(tm)
+        try:
+            kms = multi_kekulize(tm)
 
-        for km in kms:
-            get_tauts_by_smirks(km, tauts_dict)
+            for km in kms:
+                get_tauts_by_smirks(km, tauts_dict)
+        except:
+            continue
     return 
 
 def enumerate_tauts(om):
@@ -171,13 +225,16 @@ def enumerate_tauts(om):
         tauts_dict = init_dict(smirks)
         m = Chem.AddHs(m)
         get_tauts_by_smirks(m, tauts_dict, kekulize=False)
+
+        try:
+            kms = multi_kekulize(m)
         
-        kms = multi_kekulize(m)
-    
-        for km in kms:
-            get_tauts_by_smirks(km, tauts_dict)
+            for km in kms:
+                get_tauts_by_smirks(km, tauts_dict)
+        except:
+            pass
         
-        for i in range(5):
+        for i in range(2):
             get_tauts_by_dict(tauts_dict)
 
         ntauts = unique_tauts(tauts_dict,om)
