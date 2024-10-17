@@ -716,12 +716,6 @@ if __name__=="__main__":
     
     run_directory = os.path.join( folder, "models" )
     
-    val_Rp, val_r2, val_mae, val_rmse = valid_fn(valid_dataloader, siamese_net)
-    print( "Testing Epoch: Init, Rp: {}, R2: {}, MAE: {}, RMSE: {}\n".format( val_Rp, 
-                                                                              val_r2, 
-                                                                              val_mae, 
-                                                                              val_rmse))
-    
     best_loss = np.inf
     for epoch in range(2000):
         siamese_net.train()
@@ -737,11 +731,11 @@ if __name__=="__main__":
         shadow_net = optimizer.shadow_model
         
         val_Rp, val_r2, val_mae, val_rmse = valid_fn(valid_dataloader, shadow_net)
-        print( "Testing Epoch: {}, Rp: {}, R2: {}, MAE: {}, RMSE: {}\n".format( epoch, 
-                                                                                val_Rp, 
-                                                                                val_r2, 
-                                                                                val_mae, 
-                                                                                val_rmse))
+        print( "Testing Epoch: {}, Rp: {:.3f}, R2: {:.3f}, MAE: {:.3f}, RMSE: {:.3f}\n".format( epoch, 
+                                                                                                val_Rp, 
+                                                                                                val_r2, 
+                                                                                                val_mae, 
+                                                                                                val_rmse))
     
         scheduler.step(val_rmse)
         
