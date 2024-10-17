@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+
 import os, sys
 module_path = os.path.abspath(os.path.join('..'))  # 获取上一级目录
 sys.path.append(module_path)
 
 from torch.optim.swa_utils import AveragedModel
+from collections import OrderedDict
 
 from taut_src.Networks.PhysDimeNet import PhysDimeNet
 from torch.nn import Module
@@ -35,6 +37,7 @@ from scipy.stats import pearsonr
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+
 _force_cpu = False
 
 def fix_model_keys(state_dict):
@@ -56,7 +59,6 @@ def get_coords(pmol):
     for atom in pmol.atoms:
         coords.append(atom.coords)
     return np.array(coords)
-
 
 def get_elements(pmol):
     z = []
@@ -581,19 +583,18 @@ def loss_fn(output, ddG):
 
 
 @torch.no_grad()
-def valid_fn(data_loader1, data_loader2, 
-             data_loader3, model):
+def valid_fn(data_loader, model):
     model.eval()
 
     trues, preds = [], []
-    for data1, data2, ddG in zip(data_loader1, data_loader2, data_loader3):
+    for data1, data2, ddG_g, ddG_w in data_loader:
         data1 = data1.to(get_device())
         data2 = data2.to(get_device())
-        ddG = ddG.to(get_device()).view(-1, 1).double()
+        ddG_w = ddG_w.to(get_device()).view(-1, 1).double()
         
         output = model(data1, data2)[:, 1:]
         preds.extend(output.view(-1).cpu().numpy().tolist())
-        trues.extend(ddG.view(-1).cpu().numpy().tolist())
+        trues.extend(ddG_w.view(-1).cpu().numpy().tolist())
 
     all_mae = mean_absolute_error(trues, preds)
     all_rmse = np.sqrt(mean_squared_error(trues, preds))
@@ -602,9 +603,12 @@ def valid_fn(data_loader1, data_loader2,
     return Rp, r2, all_mae, all_rmse
 
 
-def train_step( data1, data2, 
-                ddG_gas, ddG_water, 
-                model, optimizer):
+def train_step( data1, 
+                data2, 
+                ddG_gas, 
+                ddG_water, 
+                model,
+                optimizer):
     optimizer.zero_grad()
     
     data1 = data1.to(get_device())
@@ -630,98 +634,115 @@ def init_model(model_path):
     return siamese_net
 
 
-def prepare_dataloader( df_train,  batch_size ):
-    train_data1, train_data2 = [], []
-    train_ddGs_gas, train_ddGs_water = [], []
-    for idx, name, smi1, smi2, ddG_w in df_train.itertuples():
+def split_dataset(dataset):
+    set_0, set_1, set_2, set_3 = [], [], [], []
+    for pair in dataset:
+        set_0.append( pair[0] )
+        set_1.append( pair[1] )
+        set_2.append( pair[2] )
+        set_3.append( pair[3] )
+    return set_0, set_1, set_2, set_3
+
+
+class PairDataset(torch.utils.data.Dataset):
+    def __init__(self, datasetA, datasetB, datasetC, datasetD):
+        self.datasetA = datasetA
+        self.datasetB = datasetB
+        self.datasetC = datasetC
+        self.datasetD = datasetD
+        
+
+    def __getitem__(self, idx):
+        return self.datasetA[idx], self.datasetB[idx], self.datasetC[idx], self.datasetD[idx]
+
+    def __len__(self):
+            return len(self.datasetA)
+
+
+def collate(data_list):
+    batchA = Batch.from_data_list([data[0] for data in data_list])
+    batchB = Batch.from_data_list([data[1] for data in data_list])
+    batchC = Batch.from_data_list([data[2] for data in data_list])
+    batchD = Batch.from_data_list([data[3] for data in data_list])
+    return batchA, batchB, batchC, batchD
+
+
+def construct_pair_dataloader(dataset, batch_size, shuffle):
+    set_0, set_1, set_2, set_3 = split_dataset( dataset )
+    pair_dataset = PairDataset( set_0, set_1, set_2, set_3 )
+
+    loader = DataLoader(pair_dataset, 
+                        batch_size=batch_size, 
+                        shuffle=shuffle, 
+                        num_workers=0,  
+                        collate_fn=collate)
+    return loader
+
+
+def prepare_dataloader( df,  batch_size, shuffle ):
+    datasets = []
+    for idx, name, smi1, smi2, ddG_w in df.itertuples():
        nthis_data1 = calc_data(smi1)
        nthis_data2 = calc_data(smi2)
        E_gas2 = get_dft_pmol(name, index=2)
        E_gas1 = get_dft_pmol(name, index=1)
        ddG_g = E_gas2-E_gas1
+       datasets.append( [nthis_data1, nthis_data2, ddG_g, ddG_w] )
+    print("Dataset generating done, it contains {} samples.".format( len(datasets) ))
     
-       train_data1.append(nthis_data1)
-       train_data2.append(nthis_data2)
-       
-       train_ddGs_water.append( ddG_w )
-       train_ddGs_gas.append( ddG_g)
-       if idx % 10 == 0:
-           print(idx)
-           
-    train_loader1 = DataLoader(train_data1, 
-                               batch_size=batch_size, 
-                               shuffle=False)
-    train_loader2 = DataLoader(train_data2, 
-                               batch_size=batch_size, 
-                               shuffle=False)
-    train_loader3 = DataLoader(train_ddGs_gas, 
-                               batch_size=batch_size, 
-                               shuffle=False)
-    train_loader4 = DataLoader(train_ddGs_water, 
-                               batch_size=batch_size, 
-                               shuffle=False)
-    return train_loader1, train_loader2, train_loader3, train_loader4
+    dataloader = construct_pair_dataloader(datasets, batch_size, shuffle)
+    return dataloader
 
 
-
-if __name__ == "__main__":
+if __name__=="__main__":
     pretrain_model_path = "models/best_model.pt"
     siamese_net = init_model(pretrain_model_path)
-
-    optimizer = EmaAmsGrad(siamese_net, weight_decay=0.001, lr=0.0001, ema=0.999, shadow_dict=siamese_net.state_dict())
+    
+    optimizer = EmaAmsGrad( siamese_net, 
+                            weight_decay=0.001, 
+                            lr=0.0001, ema=0.999, 
+                            shadow_dict=siamese_net.state_dict())
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1, patience=100)
-
-
+    
+    
     folder = sys.argv[1]
-
     df_gas = pd.read_csv("tautobase_gas_phase.csv")
     df_train = pd.read_csv(os.path.join(folder, "fine_tune_train.csv")).loc[:, ['name', 'smiles0', 'smiles1', 'ddG']]
     df_test = pd.read_csv(os.path.join( folder, "fine_tune_valid.csv")).loc[:, ['name', 'smiles0', 'smiles1', 'ddG']]
-
-    train_loader1, train_loader2, train_loader3, train_loader4 = prepare_dataloader( df_train, batch_size=64 )
-    valid_loader1, valid_loader2, valid_loader3, valid_loader4 = prepare_dataloader( df_test, batch_size=16 )
-
-
+    
+    train_dataloader = prepare_dataloader( df_train, batch_size=64, shuffle=False )
+    valid_dataloader = prepare_dataloader( df_test, batch_size=16, shuffle=False )
+    
+    
     run_directory = os.path.join( folder, "models" )
-
-    val_Rp, val_r2, val_mae, val_rmse = valid_fn( valid_loader1, 
-                                                valid_loader2, 
-                                                valid_loader4, 
-                                                siamese_net)
+    
+    val_Rp, val_r2, val_mae, val_rmse = valid_fn(valid_dataloader, siamese_net)
     print( "Testing Epoch: Init, Rp: {}, R2: {}, MAE: {}, RMSE: {}\n".format( val_Rp, 
-                                                                            val_r2, 
-                                                                            val_mae, 
-                                                                            val_rmse))
-
+                                                                              val_r2, 
+                                                                              val_mae, 
+                                                                              val_rmse))
+    
     best_loss = np.inf
     for epoch in range(2000):
         siamese_net.train()
         
         train_loss = 0.
-        for data1, data2, ddG_gas, ddG_water in zip(train_loader1, train_loader2, train_loader3, train_loader4):
-            loss = train_step(data1, 
-                            data2, 
-                            ddG_gas, 
-                            ddG_water, 
-                            siamese_net, 
-                            optimizer)
+        for data1, data2, ddG_gas, ddG_water in train_dataloader:
+            loss = train_step(data1, data2, ddG_gas, ddG_water, siamese_net, optimizer)
             train_loss += loss.item() * data1.num_graphs
-
+    
             loss = train_step(data2, data1, -1.0 * ddG_gas, -1.0 * ddG_water, siamese_net, optimizer)
             train_loss += loss.item() * data1.num_graphs
             
         shadow_net = optimizer.shadow_model
         
-        val_Rp, val_r2, val_mae, val_rmse = valid_fn( valid_loader1, 
-                                                    valid_loader2, 
-                                                    valid_loader4, 
-                                                    shadow_net)
+        val_Rp, val_r2, val_mae, val_rmse = valid_fn(valid_dataloader, shadow_net)
         print( "Testing Epoch: {}, Rp: {}, R2: {}, MAE: {}, RMSE: {}\n".format( epoch, 
                                                                                 val_Rp, 
                                                                                 val_r2, 
                                                                                 val_mae, 
                                                                                 val_rmse))
-
+    
         scheduler.step(val_rmse)
         
         if val_rmse < best_loss:
@@ -730,7 +751,5 @@ if __name__ == "__main__":
             torch.save(shadow_net.state_dict(), osp.join(run_directory, 'training_model.pt'))
             torch.save(optimizer.state_dict(), osp.join(run_directory, 'best_model_optimizer.pt'))
             torch.save(scheduler.state_dict(), osp.join(run_directory, "best_model_scheduler.pt"))
-
-
 
 
