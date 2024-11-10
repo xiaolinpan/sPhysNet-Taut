@@ -10,8 +10,6 @@ with open(transform_path, "r") as f:
     conts = f.readlines()
 smirks = [line.strip("\n").split("\t") for line in conts]
 
-ps = Chem.SmilesParserParams()
-ps.removeHs = False
 
 def uncharge_mol(smi):
     mol = Chem.MolFromSmiles(smi)
@@ -162,17 +160,22 @@ def filter_kekulize(m, patterns):
     return True 
 
 
-def multi_kekulize(m, psmarts=["O=[N+]([O-])"]):
-    patterns = [Chem.MolFromSmarts(smart) for smart in psmarts]
-    mols = Chem.ResonanceMolSupplier(m, Chem.KEKULE_ALL)
-    ms = []
+def multi_kekulize(m):
+    ps = Chem.SmilesParserParams()
+    ps.removeHs = False
+
+    mols = Chem.ResonanceMolSupplier(m, Chem.KEKULE_ALL )
+    kmols = []
     for m in mols:
-        # if not filter_kekulize(m, patterns):
-        #     continue
+        for atom in m.GetAtoms():
+             atom.SetIsAromatic(False)
+        for bond in m.GetBonds():
+             bond.SetIsAromatic(False)
         smi = Chem.MolToSmiles(m, kekuleSmiles=True)
         nm = Chem.MolFromSmiles(smi, ps)
-        ms.append(nm)
-    return ms
+        kmols.append(m)
+    return kmols
+
 
 def is_include_element(mol, element_list=[15]):
     elements = any([at.GetAtomicNum() in element_list for at in mol.GetAtoms()])
