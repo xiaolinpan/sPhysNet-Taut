@@ -200,13 +200,13 @@ def write_file(datas, sdf_path, ionization):
     conf_data = []
     for data in datas:
         tsmi = data['tsmi']
-        psmis = data['psmis']
         score = data['score']
         label = data['label']
         if label == "high_energy":
             continue
        
         if ionization:
+            psmis = data['psmis']
             for smi in psmis:
                 mol, cids = generate_conf(smi)
                 mol.SetProp("tautomer smiles", tsmi)
