@@ -173,7 +173,7 @@ def multi_kekulize(m):
              bond.SetIsAromatic(False)
         smi = Chem.MolToSmiles(m, kekuleSmiles=True)
         nm = Chem.MolFromSmiles(smi, ps)
-        kmols.append(m)
+        kmols.append(nm)
     return kmols
 
 
