@@ -70,7 +70,7 @@ def protect_nitro(mol):
 
 
 def protect_nitroso(mol):
-    pattern = Chem.MolFromSmarts("[#7]~[#8]")
+    pattern = Chem.MolFromSmarts("[#7]~[#8;X1]")
     atom_idx = sum(mol.GetSubstructMatches(pattern), ())
     for at in mol.GetAtoms():
         if at.GetIdx() in atom_idx:
