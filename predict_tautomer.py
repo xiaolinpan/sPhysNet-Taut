@@ -18,7 +18,16 @@ import argparse
 
 un = rdMolStandardize.Uncharger()
 
-
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+    
 def is_need_mol(mol, element_list=[1, 6, 7, 8, 9, 15, 16, 17]):
     if mol is not None:
         elements = all(
@@ -169,6 +178,7 @@ def func(smi, cutmol, energy_range=2.8, ionization=True, ph=7.0, tph=1.0, num_co
     mm = un.uncharge(mm)
     mm = Chem.MolFromSmiles(Chem.MolToSmiles(mm))
     if cutmol:
+        print("cutmol")
         if is_cut_mol(mm):
             dfs_res_lower, dfs_res_upper = generate_tautomer_cutmol(
                 smi, energy_range=energy_range, num_confs=num_confs)
@@ -181,7 +191,6 @@ def func(smi, cutmol, energy_range=2.8, ionization=True, ph=7.0, tph=1.0, num_co
     
     if ionization:
         dfs_res_lower[2] = dfs_res_lower[0].map(lambda x: protonate_mol(x, ph, tph))
-        # dfs_res_upper[2] = dfs_res_upper[0].map(lambda x: protonate_mol(x, ph, tph))
     return dfs_res_lower, dfs_res_upper
 
 
@@ -256,6 +265,7 @@ def get_taut_data(smi, cutmol, num_confs, energy_cutoff, ionization, ph, tph):
         ionization=ionization,
         ph=ph,
         tph=tph)
+
     datas_lower = construct_data(
         dfs_res_lower,
         label="low_energy",
@@ -276,13 +286,19 @@ def run():
         type=str,
         default='O=c1ccnc[nH]1',
         help='the molecular smiles')
+    
     parser.add_argument(
         '--low_energy_tautomer_cutoff',
         type=float,
         default=2.8,
         help='the energy cutoff for low energy')
-    parser.add_argument('--cutmol', type=bool, default=True,
-                        help='determine to frag the molecule')
+    
+    parser.add_argument(
+        '--cutmol', 
+        type=str2bool, 
+        default=False,
+        help='determine to frag the molecule')
+    
     parser.add_argument(
         '--num_confs',
         type=int,
@@ -291,7 +307,7 @@ def run():
     
     parser.add_argument(
         '--ionization',
-        type=bool,
+        type=str2bool,
         default=False,
         help='determine to generate ionization states by predicted pKa using the given pH'
     )
