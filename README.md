@@ -63,7 +63,6 @@ Alternatively, you can run it via Jupyter Notebook; the results will be displaye
 If you use this project in your research, please cite the following papers:
 
 * **Pan, Xiaolin, Xudong Zhang, Song Xia, and Yingkai Zhang. Fast and Accurate Prediction of Tautomer Ratios in Aqueous Solution via a Siamese Neural Network. J. Chem. Theory Comput. 2025, 21, 6, 3132–3141.**
-* **Pan, Xiaolin, Fanyu Zhao, Yueqing Zhang, Xingyu Wang, Xudong Xiao, John ZH Zhang, and Changge Ji. MolTaut: A Tool for the Rapid Generation of Favorable Tautomer in Aqueous Solution. J. Chem. Inf. Model. 2023, 63, 7, 1833–1840.**
 
 
 ## Model architecture
