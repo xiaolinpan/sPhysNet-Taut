@@ -87,6 +87,15 @@ def protect_phosphoric(mol):
     return
 
 
+def protect_phosphoeoua(mol):
+    pattern = Chem.MolFromSmarts("[#8]~[#15](~[#8])(~[#8])~[!#8]")
+    atom_idx = sum(mol.GetSubstructMatches(pattern), ())
+    for at in mol.GetAtoms():
+        if at.GetIdx() in atom_idx:
+            at.SetProp('_protected', '1')
+    return
+
+
 def protect_anitro(mol):
     pattern = Chem.MolFromSmarts("[#6]-[#6;!R]=[#7;!R]-[#6]")
     res = [i[1:-1] for i in mol.GetSubstructMatches(pattern)]
@@ -95,6 +104,7 @@ def protect_anitro(mol):
         if at.GetIdx() in atom_idx:
             at.SetProp('_protected', '1')
     return
+
 
 def get_tauts_by_smirks(mm, tauts_dict, kekulize=True):
     m = copy.deepcopy(mm)
@@ -105,6 +115,7 @@ def get_tauts_by_smirks(mm, tauts_dict, kekulize=True):
     protect_nitroso(m)
     protect_phosphoric(m)
     protect_anitro(m)
+    protect_phosphoeoua(m)
 
     if kekulize:
         Chem.Kekulize(m, clearAromaticFlags=True)
@@ -220,27 +231,49 @@ def get_tauts_by_dict(tauts_dict):
             continue
     return 
 
+# def enumerate_tauts(om):
+#     m = copy.deepcopy(om)
+#     if is_include_element(m):
+#         ntauts = tauts_for_special_frag(m)
+#     else:
+#         tauts_dict = init_dict(smirks)
+#         m = Chem.AddHs(m)
+#         get_tauts_by_smirks(m, tauts_dict, kekulize=False)
+
+#         try:
+#             kms = multi_kekulize(m)
+        
+#             for km in kms:
+#                 get_tauts_by_smirks(km, tauts_dict)
+#         except:
+#             pass
+        
+#         for i in range(2):
+#             get_tauts_by_dict(tauts_dict)
+
+#         ntauts = unique_tauts(tauts_dict,om)
+#     return ntauts
+
+
 def enumerate_tauts(om):
     m = copy.deepcopy(om)
-    if is_include_element(m):
-        ntauts = tauts_for_special_frag(m)
-    else:
-        tauts_dict = init_dict(smirks)
-        m = Chem.AddHs(m)
-        get_tauts_by_smirks(m, tauts_dict, kekulize=False)
+   
+    tauts_dict = init_dict(smirks)
+    m = Chem.AddHs(m)
+    get_tauts_by_smirks(m, tauts_dict, kekulize=False)
 
-        try:
-            kms = multi_kekulize(m)
-        
-            for km in kms:
-                get_tauts_by_smirks(km, tauts_dict)
-        except:
-            pass
-        
-        for i in range(2):
-            get_tauts_by_dict(tauts_dict)
+    try:
+        kms = multi_kekulize(m)
+    
+        for km in kms:
+            get_tauts_by_smirks(km, tauts_dict)
+    except:
+        pass
+    
+    for i in range(2):
+        get_tauts_by_dict(tauts_dict)
 
-        ntauts = unique_tauts(tauts_dict,om)
+    ntauts = unique_tauts(tauts_dict,om)
     return ntauts
 
 
