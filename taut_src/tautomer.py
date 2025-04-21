@@ -105,6 +105,15 @@ def protect_carboxyl(mol):
     return
 
 
+def protect_aromatic_carbon_ring(mol):
+    pattern = Chem.MolFromSmarts("[#6;H1]1:[#6](:[#6;H1]:[#6;H1]:[#6;H1]:[#6]:1-[#6])-[#6]")
+    atom_idx = sum(mol.GetSubstructMatches(pattern), ())
+    for at in mol.GetAtoms():
+        if at.GetIdx() in atom_idx:
+            at.SetProp('_protected', '1')
+    return
+
+
 def protect_anitro(mol):
     pattern = Chem.MolFromSmarts("[#6]-[#6;!R]=[#7;!R]-[#6]")
     res = [i[1:-1] for i in mol.GetSubstructMatches(pattern)]
@@ -126,6 +135,7 @@ def get_tauts_by_smirks(mm, tauts_dict, kekulize=True):
     protect_anitro(m)
     protect_carboxyl(m)
     protect_phosphoeoua(m)
+    protect_aromatic_carbon_ring(m)
 
     if kekulize:
         Chem.Kekulize(m, clearAromaticFlags=True)
@@ -143,7 +153,6 @@ def get_tauts_by_smirks(mm, tauts_dict, kekulize=True):
                 if smi:
                     tauts_dict[str(idx)+"_"+name].append(smi)
     return
-
 
 
 def unique_tauts(tauts_dict, m):
