@@ -96,6 +96,15 @@ def protect_phosphoeoua(mol):
     return
 
 
+def protect_carboxyl(mol):
+    pattern = Chem.MolFromSmarts("[#6](-[#8])=[#8]")
+    atom_idx = sum(mol.GetSubstructMatches(pattern), ())
+    for at in mol.GetAtoms():
+        if at.GetIdx() in atom_idx:
+            at.SetProp('_protected', '1')
+    return
+
+
 def protect_anitro(mol):
     pattern = Chem.MolFromSmarts("[#6]-[#6;!R]=[#7;!R]-[#6]")
     res = [i[1:-1] for i in mol.GetSubstructMatches(pattern)]
@@ -115,6 +124,7 @@ def get_tauts_by_smirks(mm, tauts_dict, kekulize=True):
     protect_nitroso(m)
     protect_phosphoric(m)
     protect_anitro(m)
+    protect_carboxyl(m)
     protect_phosphoeoua(m)
 
     if kekulize:
