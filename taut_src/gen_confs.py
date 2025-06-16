@@ -39,7 +39,8 @@ def generate_confs(smi, numConfs=1):
     clusters = cluster_conformers(mol, rmsd_cutoff=0.5)
 
     confs = []
-    for cid in clusters:
+    for cids in clusters:
+        cid = cids[0]
         mol_conf = extract_mol_by_confId(mol, cid)
         confs.append(mol_conf)
     return confs
