@@ -1,3 +1,4 @@
+from typing import Any
 import copy
 import gc
 import logging
@@ -42,13 +43,13 @@ mse_fn = torch.nn.MSELoss(reduction='mean')
 _device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def get_device():
+def get_device() -> Any:
     # we use a function to get device for proper distributed training behaviour
     # return torch.device("cpu")
     return _device
 
 
-def find_free_port():
+def find_free_port() -> Any:
     """ https://stackoverflow.com/questions/1365265/on-localhost-how-do-i-pick-a-free-port-number """
     import socket
     from contextlib import closing
@@ -59,7 +60,7 @@ def find_free_port():
         return str(s.getsockname()[1])
 
 
-def _cutoff_fn(D, cutoff):
+def _cutoff_fn(D: Any, cutoff: Any) -> Any:
     """
     Private function called by rbf_expansion(D, K=64, cutoff=10)
     """
@@ -72,7 +73,7 @@ def _cutoff_fn(D, cutoff):
     return result
 
 
-def gaussian_rbf(D, centers, widths, cutoff, return_dict=False):
+def gaussian_rbf(D: Any, centers: Any, widths: Any, cutoff: Any, return_dict: Any=False) -> Any:
     """
     The rbf expansion of a distance
     Input D: matrix that contains the distance between to atoms
@@ -87,7 +88,7 @@ def gaussian_rbf(D, centers, widths, cutoff, return_dict=False):
         return rbf
 
 
-def _get_index_from_matrix(num, previous_num):
+def _get_index_from_matrix(num: Any, previous_num: Any) -> Any:
     """
     get the edge index compatible with torch_geometric message passing module
     eg: when num = 3, will return:
@@ -111,7 +112,7 @@ def _get_index_from_matrix(num, previous_num):
 matrix_modify = {}
 
 
-def _get_modify_matrix(num):
+def _get_modify_matrix(num: Any) -> Any:
     """
     get the modify matrix.
     equivalent to -torch.eye(num)
@@ -132,7 +133,7 @@ def _get_modify_matrix(num):
 batch_pattern = {}
 
 
-def _get_batch_pattern(batch_size, max_num):
+def _get_batch_pattern(batch_size: Any, max_num: Any) -> Any:
     """
     get the batch pattern, for example, if batch_size=5, max_num=3
     the pattern will be: [0,0,0,1,1,1,2,2,2,3,3,3,4,4,4]
@@ -147,7 +148,7 @@ def _get_batch_pattern(batch_size, max_num):
         return pattern
 
 
-def _cal_dist(d1, d2):
+def _cal_dist(d1: Any, d2: Any) -> Any:
     """
     calculate the Euclidean distance between d1 and d2
     :param d1:
@@ -158,14 +159,14 @@ def _cal_dist(d1, d2):
     return torch.sqrt(torch.sum(torch.mul(delta_R, delta_R))).view(-1, 1).type(floating_type)
 
 
-def softplus_inverse(x):
+def softplus_inverse(x: Any) -> Any:
     """
     Private function called by rbf_expansion(D, K=64, cutoff=10)
     """
     return torch.log(-torch.expm1(-x)) + x
 
 
-def _cutoff_fn(D, cutoff):
+def _cutoff_fn(D: Any, cutoff: Any) -> Any:
     """
     Private function called by rbf_expansion(D, K=64, cutoff=10)
     """
@@ -178,7 +179,7 @@ def _cutoff_fn(D, cutoff):
     return result
 
 
-def _chi_ij(R_ij, cutoff):
+def _chi_ij(R_ij: Any, cutoff: Any) -> Any:
     """
     Chi(Rij) function which is used to calculate long-range energy
     return 0 when R_ij = -1 (use -1 instead of 0 to prevent nan when backward)
@@ -188,7 +189,7 @@ def _chi_ij(R_ij, cutoff):
                        (1 - _cutoff_fn(2 * R_ij, cutoff)) / R_ij, torch.zeros_like(R_ij))
 
 
-def _correct_q(qi, N, atom_to_mol_batch, q_ref):
+def _correct_q(qi: Any, N: Any, atom_to_mol_batch: Any, q_ref: Any) -> Any:
     """
     calculate corrected partial_q in PhysNet
     :param qi: partial charge predicted by PhysNet, shape(-1, 1)
@@ -203,7 +204,7 @@ def _correct_q(qi, N, atom_to_mol_batch, q_ref):
     return qi - broadcasted_correct_term
 
 
-def cal_coulomb_E(qi: torch.Tensor, edge_dist, edge_index, cutoff, q_ref, N, atom_mol_batch):
+def cal_coulomb_E(qi: torch.Tensor, edge_dist: Any, edge_index: Any, cutoff: Any, q_ref: Any, N: Any, atom_mol_batch: Any) -> Any:
     """
     Calculate coulomb Energy from chi(Rij) and corrected q
     Calculate ATOM-WISE energy!
@@ -259,7 +260,7 @@ def cal_coulomb_E(qi: torch.Tensor, edge_dist, edge_index, cutoff, q_ref, N, ato
     return (coulomb_E / 2).to(get_device())
 
 
-def cal_p(qi, R, atom_to_mol_batch):
+def cal_p(qi: Any, R: Any, atom_to_mol_batch: Any) -> Any:
     """
     Calculate pi from qi and molecule coordinate
     :return: pi
@@ -270,7 +271,7 @@ def cal_p(qi, R, atom_to_mol_batch):
     return p
 
 
-def cal_edge(R, N, prev_N, edge_index, cal_coulomb=True):
+def cal_edge(R: Any, N: Any, prev_N: Any, edge_index: Any, cal_coulomb: Any=True) -> Any:
     """
     calculate edge distance from edge_index;
     if cal_coulomb is True, additional edge will be calculated without any restriction
@@ -306,7 +307,7 @@ def cal_edge(R, N, prev_N, edge_index, cal_coulomb=True):
     return coulomb_dist, coulomb_index, short_range_dist, short_range_index
 
 
-def get_batch(atom_map, max_num):
+def get_batch(atom_map: Any, max_num: Any) -> Any:
     """
     from map to batch
     :param atom_map:
@@ -318,7 +319,7 @@ def get_batch(atom_map, max_num):
     return torch.LongTensor(pattern)[atom_map]
 
 
-def get_uniform_variance(n1, n2):
+def get_uniform_variance(n1: Any, n2: Any) -> Any:
     """
     get the uniform variance to initialize the weight of DNNs suggested at
     Glorot,X.;Bengio,Y. Understanding the Difficulty of Training Deep Feed forward Neural Networks.
@@ -330,7 +331,7 @@ def get_uniform_variance(n1, n2):
 
 
 # generates a random square orthogonal matrix of dimension dim
-def square_orthogonal_matrix(dim=3, seed=None):
+def square_orthogonal_matrix(dim: Any=3, seed: Any=None) -> Any:
     random_state = np.random
     if seed is not None:  # allows to get the same matrix every time
         random_state.seed(seed)
@@ -353,7 +354,7 @@ def square_orthogonal_matrix(dim=3, seed=None):
 
 
 # generates a random (semi-)orthogonal matrix of size NxM
-def semi_orthogonal_matrix(N, M, seed=None):
+def semi_orthogonal_matrix(N: Any, M: Any, seed: Any=None) -> Any:
     if N > M:  # number of rows is larger than number of columns
         square_matrix = square_orthogonal_matrix(dim=N, seed=seed)
     else:  # number of columns is larger than number of rows
@@ -367,13 +368,13 @@ def semi_orthogonal_matrix(N, M, seed=None):
 # (stated by eg. "Reducing overfitting in deep networks by decorrelating representations",
 # "Dropout: a simple way to prevent neural networks from overfitting",
 # "Exact solutions to the nonlinear dynamics of learning in deep linear neural networks")
-def semi_orthogonal_glorot_weights(n_in, n_out, scale=2.0, seed=None):
+def semi_orthogonal_glorot_weights(n_in: Any, n_out: Any, scale: Any=2.0, seed: Any=None) -> Any:
     W = semi_orthogonal_matrix(n_in, n_out, seed=seed)
     W *= np.sqrt(scale / ((n_in + n_out) * W.var()))
     return torch.Tensor(W).type(floating_type).t()
 
 
-def get_atom_to_efgs_batch(efgs_batch, num_efgs, atom_to_mol_mask):
+def get_atom_to_efgs_batch(efgs_batch: Any, num_efgs: Any, atom_to_mol_mask: Any) -> Any:
     # efgs_batch: shape(n_batch, 29)
     # num_efgs: shape(n_batch)
 
@@ -388,7 +389,7 @@ def get_atom_to_efgs_batch(efgs_batch, num_efgs, atom_to_mol_mask):
     return atom_to_efgs_batch
 
 
-def get_kd_tree_array(R, N):
+def get_kd_tree_array(R: Any, N: Any) -> Any:
     """
     Used in data_provider, encapsulate coordinates and numbers into a kd_tree array(tensor)
     :param R: Coordinates
@@ -402,7 +403,7 @@ def get_kd_tree_array(R, N):
     return kd_trees
 
 
-def atom_mean_std(E, N, index):
+def atom_mean_std(E: Any, N: Any, index: Any) -> Any:
     """
     calculate the mean and stand variance of Energy in the training set
     :return:
@@ -420,11 +421,11 @@ def atom_mean_std(E, N, index):
     return mean, std
 
 
-def _pre_nums(N, i):
+def _pre_nums(N: Any, i: Any) -> Any:
     return N[i - 1] if i > 0 else 0
 
 
-def load_data_from_index(dataset, indexes):
+def load_data_from_index(dataset: Any, indexes: Any) -> Any:
     """
     Similar to Batch.to_data_list() method in torch_geometric
     :param indexes:
@@ -435,11 +436,11 @@ def load_data_from_index(dataset, indexes):
     return result
 
 
-def _cal_dim(key):
+def _cal_dim(key: Any) -> Any:
     return -1 if re.search("index", key) else 0
 
 
-def collate_fn(data_list, clone=False, cal_acsf=False):
+def collate_fn(data_list: Any, clone: Any=False, cal_acsf: Any=False) -> Any:
     """
     Note: using clone here, maybe not efficient
     :param cal_acsf: calculate ACSF
@@ -495,8 +496,8 @@ def collate_fn(data_list, clone=False, cal_acsf=False):
     return batch.contiguous()
 
 
-def dime_edge_expansion(R, edge_index, msg_edge_index, n_dime_rbf, dist_calculator, bessel_calculator,
-                        feature_interact_dist, cos_theta=True, return_dict=False, **kwargs):
+def dime_edge_expansion(R: Any, edge_index: Any, msg_edge_index: Any, n_dime_rbf: Any, dist_calculator: Any, bessel_calculator: Any,
+                        feature_interact_dist: Any, cos_theta: Any=True, return_dict: Any=False, **kwargs: Any) -> Any:
     # t0 = record_data('edge_msg_gen.load_data', t0)
 
     """
@@ -522,7 +523,7 @@ def dime_edge_expansion(R, edge_index, msg_edge_index, n_dime_rbf, dist_calculat
         return rbf_ji, sbf_kji
 
 
-def get_n_params(model, logger=None, only_trainable=False):
+def get_n_params(model: Any, logger: Any=None, only_trainable: Any=False) -> Any:
     """
     Calculate num of parameters in the model
     :param only_trainable: Only count trainable
@@ -541,7 +542,7 @@ def get_n_params(model, logger=None, only_trainable=False):
     return sum([x.nelement() for x in counted_params]), result
 
 
-def cal_angle(R, edge1, edge2, cal_cos_theta):
+def cal_angle(R: Any, edge1: Any, edge2: Any, cal_cos_theta: Any) -> Any:
     delta_R1 = R[edge1[0, :], :] - R[edge1[1, :], :]
     delta_R2 = R[edge2[0, :], :] - R[edge2[1, :], :]
     inner = torch.sum(delta_R1 * delta_R2, dim=-1)
@@ -555,7 +556,7 @@ def cal_angle(R, edge1, edge2, cal_cos_theta):
     return angle.view(-1, 1)
 
 
-def get_tensors():
+def get_tensors() -> Any:
     """
     print out tensors in current system to debug memory leak
     :return: set of infos about tensors
@@ -572,12 +573,12 @@ def get_tensors():
     return result
 
 
-def get_lr(optimizer):
+def get_lr(optimizer: Any) -> Any:
     for param_group in optimizer.param_groups:
         return param_group['lr']
 
 
-def info_resolver(s):
+def info_resolver(s: Any) -> Any:
     """
     Internal function which resolve expansion function into details, eg:
     gaussian_64_10.0 means gaussian expansion, n=64 and cutoff=10.0
@@ -604,7 +605,7 @@ def info_resolver(s):
     return result
 
 
-def expansion_splitter(s):
+def expansion_splitter(s: Any) -> Any:
     """
     Internal use only
     Strip expansion function into a dictionary
@@ -625,11 +626,11 @@ def expansion_splitter(s):
     return result
 
 
-def error_message(value, name):
+def error_message(value: Any, name: Any) -> Any:
     raise ValueError('Invalid {} : {}'.format(name, value))
 
 
-def print_val_results(dataset_name, loss, emae, ermse, qmae, qrmse, pmae, prmse):
+def print_val_results(dataset_name: Any, loss: Any, emae: Any, ermse: Any, qmae: Any, qrmse: Any, pmae: Any, prmse: Any) -> Any:
     log_info = 'Validating {}: '.format(dataset_name)
     log_info += (' loss: {:.6f} '.format(loss))
     log_info += ('emae: {:.6f} '.format(emae))
@@ -641,7 +642,7 @@ def print_val_results(dataset_name, loss, emae, ermse, qmae, qrmse, pmae, prmse)
     return log_info
 
 
-def option_solver(option_txt, type_conversion=False, return_base=False):
+def option_solver(option_txt: Any, type_conversion: Any=False, return_base: Any=False) -> Any:
     option_base = option_txt.split('[')[0]
     if len(option_txt.split('[')) == 1:
         result = {}
@@ -675,7 +676,7 @@ def option_solver(option_txt, type_conversion=False, return_base=False):
         return result
 
 
-def preprocess_config(config_dict):
+def preprocess_config(config_dict: Any) -> Any:
     config_dict = copy.deepcopy(config_dict)
     for bool_key in ["debug_mode", "auto_sol", "reset_optimizer", "target_nodes", "reset_output_layers",
                      "normalize", "shared_normalize_param", "restrain_non_bond_pred", "reset_scale_shift",
@@ -699,7 +700,7 @@ def preprocess_config(config_dict):
     return config_dict
 
 
-def init_model_test(config_dict, state_dict):
+def init_model_test(config_dict: Any, state_dict: Any) -> Any:
     from Networks.PhysDimeNet import PhysDimeNet
     model = PhysDimeNet(**preprocess_config(config_dict)).to(get_device()).type(floating_type)
     model = AveragedModel(model)
@@ -710,7 +711,7 @@ def init_model_test(config_dict, state_dict):
     return model
 
 
-def non_collapsing_folder(folder_prefix: str, identify="_run_"):
+def non_collapsing_folder(folder_prefix: str, identify: Any="_run_") -> Any:
     while True:
         current_time = datetime.now().strftime('%Y-%m-%d_%H%M%S__%f')
         run_directory = folder_prefix + identify + current_time
@@ -725,7 +726,7 @@ def non_collapsing_folder(folder_prefix: str, identify="_run_"):
             time.sleep(rd_sleep)
 
 
-def add_parser_arguments(parser):
+def add_parser_arguments(parser: Any) -> Any:
     """
     add arguments to parser
     :param parser:
@@ -828,7 +829,7 @@ def add_parser_arguments(parser):
 
 
 # updated evidential regression loss
-def evidential_loss_new(mu, v, alpha, beta, targets, lam=1, epsilon=1e-4):
+def evidential_loss_new(mu: Any, v: Any, alpha: Any, beta: Any, targets: Any, lam: Any=1, epsilon: Any=1e-4) -> Any:
     """
     Adapted from https://pubs.acs.org/doi/10.1021/acscentsci.1c00546
     Use Deep Evidential Regression negative log likelihood loss + evidential
@@ -864,7 +865,7 @@ def evidential_loss_new(mu, v, alpha, beta, targets, lam=1, epsilon=1e-4):
     return loss
 
 
-def remove_handler(log=None):
+def remove_handler(log: Any=None) -> Any:
     if log is None:
         log = logging.getLogger()
     for hdlr in log.handlers[:]:  # remove all old handlers
@@ -872,7 +873,7 @@ def remove_handler(log=None):
     return
 
 
-def fix_model_keys(state_dict):
+def fix_model_keys(state_dict: Any) -> Any:
     tmp = OrderedDict()
     for key in state_dict:
         if key.startswith("module."):
@@ -886,7 +887,7 @@ def fix_model_keys(state_dict):
     return tmp
 
 
-def process_state_dict(state_dict, config_dict, logger, is_main):
+def process_state_dict(state_dict: Any, config_dict: Any, logger: Any, is_main: Any) -> Any:
     if config_dict["reset_output_layers"] or config_dict["reset_scale_shift"]:
         # OrderedDict is immutable so I have to make a copy
         new_state_dict = OrderedDict()
@@ -917,7 +918,7 @@ def process_state_dict(state_dict, config_dict, logger, is_main):
         return state_dict
 
 
-def validate_index(train_index, val_index, test_index):
+def validate_index(train_index: Any, val_index: Any, test_index: Any) -> Any:
     # make sure the indexes are legit without overlapping, etc...
     train_size = train_index.shape[0]
     train_index_set = set(train_index.numpy().tolist())
@@ -938,7 +939,7 @@ def validate_index(train_index, val_index, test_index):
 
     return train_size, val_size, test_size
 
-def solv_num_workers():
+def solv_num_workers() -> Any:
     try:
         n_cpu_avail = len(os.sched_getaffinity(0))
     except AttributeError:

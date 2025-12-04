@@ -1,3 +1,4 @@
+from typing import Any
 from taut_src.config import transform_path
 import copy
 from collections import namedtuple
@@ -11,14 +12,14 @@ with open(transform_path, "r") as f:
 smirks = [line.strip("\n").split("\t") for line in conts]
 
 
-def uncharge_mol(smi):
+def uncharge_mol(smi: Any) -> Any:
     mol = Chem.MolFromSmiles(smi)
     for i in range(5):
         mol = unc.uncharge(mol)
     return Chem.MolToSmiles(mol)
 
 
-def init_dict(smirks):
+def init_dict(smirks: Any) -> Any:
     mdict = {}
     for idx, line in enumerate(smirks):
         smrk, name = line
@@ -26,7 +27,7 @@ def init_dict(smirks):
     return mdict
 
 
-def repair_smiles(gm):
+def repair_smiles(gm: Any) -> Any:
     smi = Chem.MolToSmiles(gm)
     new_mol = Chem.MolFromSmiles(smi, sanitize=True)
     if not new_mol:
@@ -35,14 +36,14 @@ def repair_smiles(gm):
     return Chem.MolToSmiles(new_mol)
 
 
-def protect_atom(m):
+def protect_atom(m: Any) -> Any:
     for at in m.GetAtoms():
         if at == "*":
             at.SetProp('_protected', '1')
     return
 
 
-def protect_guanidine(mol):
+def protect_guanidine(mol: Any) -> Any:
     pattern = Chem.MolFromSmarts("[#7;!R]~[#6;!R](~[#7;!R])~[#7;!R]")
     atom_idx = sum(mol.GetSubstructMatches(pattern), ())
     for at in mol.GetAtoms():
@@ -51,7 +52,7 @@ def protect_guanidine(mol):
     return
 
 
-def protect_amide(mol):
+def protect_amide(mol: Any) -> Any:
     pattern = Chem.MolFromSmarts("[#7;!R]-[#6;!R]=[#8]")
     atom_idx = sum(mol.GetSubstructMatches(pattern), ())
     for at in mol.GetAtoms():
@@ -60,7 +61,7 @@ def protect_amide(mol):
     return
 
 
-def protect_nitro(mol):
+def protect_nitro(mol: Any) -> Any:
     pattern = Chem.MolFromSmarts("[#7](~[#8])~[#8]")
     atom_idx = sum(mol.GetSubstructMatches(pattern), ())
     for at in mol.GetAtoms():
@@ -69,7 +70,7 @@ def protect_nitro(mol):
     return
 
 
-def protect_nitroso(mol):
+def protect_nitroso(mol: Any) -> Any:
     pattern = Chem.MolFromSmarts("[#7]~[#8;X1]")
     atom_idx = sum(mol.GetSubstructMatches(pattern), ())
     for at in mol.GetAtoms():
@@ -78,7 +79,7 @@ def protect_nitroso(mol):
     return
 
 
-def protect_phosphoric(mol):
+def protect_phosphoric(mol: Any) -> Any:
     pattern = Chem.MolFromSmarts("[#8]~[#15](~[#8])(~[#8])~[#8]")
     atom_idx = sum(mol.GetSubstructMatches(pattern), ())
     for at in mol.GetAtoms():
@@ -87,7 +88,7 @@ def protect_phosphoric(mol):
     return
 
 
-def protect_phosphoeoua(mol):
+def protect_phosphoeoua(mol: Any) -> Any:
     pattern = Chem.MolFromSmarts("[#8]~[#15](~[#8])(~[#8])~[!#8]")
     atom_idx = sum(mol.GetSubstructMatches(pattern), ())
     for at in mol.GetAtoms():
@@ -96,7 +97,7 @@ def protect_phosphoeoua(mol):
     return
 
 
-def protect_carboxyl(mol):
+def protect_carboxyl(mol: Any) -> Any:
     pattern = Chem.MolFromSmarts("[#6](-[#8])=[#8]")
     atom_idx = sum(mol.GetSubstructMatches(pattern), ())
     for at in mol.GetAtoms():
@@ -105,7 +106,7 @@ def protect_carboxyl(mol):
     return
 
 
-def protect_aromatic_carbon_ring(mol):
+def protect_aromatic_carbon_ring(mol: Any) -> Any:
     pattern = Chem.MolFromSmarts("[#6;H1]1:[#6](:[#6;H1]:[#6;H1]:[#6;H1]:[#6]:1-[#6])-[#6]")
     atom_idx = sum(mol.GetSubstructMatches(pattern), ())
     for at in mol.GetAtoms():
@@ -114,7 +115,7 @@ def protect_aromatic_carbon_ring(mol):
     return
 
 
-def protect_anitro(mol):
+def protect_anitro(mol: Any) -> Any:
     pattern = Chem.MolFromSmarts("[#6]-[#6;!R]=[#7;!R]-[#6]")
     res = [i[1:-1] for i in mol.GetSubstructMatches(pattern)]
     atom_idx = sum(res, ())
@@ -124,7 +125,7 @@ def protect_anitro(mol):
     return
 
 
-def get_tauts_by_smirks(mm, tauts_dict, kekulize=True):
+def get_tauts_by_smirks(mm: Any, tauts_dict: Any, kekulize: Any=True) -> Any:
     m = copy.deepcopy(mm)
     protect_atom(m)
     protect_guanidine(m)
@@ -155,7 +156,7 @@ def get_tauts_by_smirks(mm, tauts_dict, kekulize=True):
     return
 
 
-def unique_tauts(tauts_dict, m):
+def unique_tauts(tauts_dict: Any, m: Any) -> Any:
     data = namedtuple('tauts',
                       'smi smirks mol')
     tauts_dict.update({"self": [Chem.MolToSmiles(Chem.MolFromSmiles(Chem.MolToSmiles(m)))]})
@@ -181,7 +182,7 @@ def unique_tauts(tauts_dict, m):
     return ntauts
 
 
-def filter_kekulize(m, patterns):
+def filter_kekulize(m: Any, patterns: Any) -> Any:
     for pattern in patterns:
         matches = sum(m.GetSubstructMatches(pattern), ())
         for at in m.GetAtoms():
@@ -190,7 +191,7 @@ def filter_kekulize(m, patterns):
     return True 
 
 
-def multi_kekulize(m):
+def multi_kekulize(m: Any) -> Any:
     ps = Chem.SmilesParserParams()
     ps.removeHs = False
 
@@ -207,7 +208,7 @@ def multi_kekulize(m):
     return kmols
 
 
-def is_include_element(mol, element_list=[15]):
+def is_include_element(mol: Any, element_list: Any=[15]) -> Any:
     elements = any([at.GetAtomicNum() in element_list for at in mol.GetAtoms()])
     if elements:
         return True
@@ -215,7 +216,7 @@ def is_include_element(mol, element_list=[15]):
         return False
 
 
-def tauts_for_special_frag(m):
+def tauts_for_special_frag(m: Any) -> Any:
     data = namedtuple('tauts',
                       'smi smirks mol')
     ntauts = []
@@ -226,7 +227,7 @@ def tauts_for_special_frag(m):
     return ntauts
 
 
-def get_mols_from_dict(tauts_dict):
+def get_mols_from_dict(tauts_dict: Any) -> Any:
     all_tsmis = []
     for rule, tsmis in tauts_dict.items():
         if len(tsmis) == 0:
@@ -237,7 +238,7 @@ def get_mols_from_dict(tauts_dict):
     all_tmols = [Chem.MolFromSmiles(smi) for smi in all_tsmis]
     return all_tmols
 
-def get_tauts_by_dict(tauts_dict):
+def get_tauts_by_dict(tauts_dict: Any) -> Any:
     all_tmols = get_mols_from_dict(tauts_dict)
     for tm in all_tmols:
         tm = Chem.AddHs(tm)
@@ -274,7 +275,7 @@ def get_tauts_by_dict(tauts_dict):
 #     return ntauts
 
 
-def enumerate_tauts(om):
+def enumerate_tauts(om: Any) -> Any:
     m = copy.deepcopy(om)
    
     tauts_dict = init_dict(smirks)

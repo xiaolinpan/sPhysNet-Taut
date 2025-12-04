@@ -1,3 +1,4 @@
+from typing import Any
 import torch
 from torch import nn
 
@@ -6,14 +7,14 @@ from torch.optim.swa_utils import AveragedModel
 from collections import OrderedDict
 
 
-def get_device():
+def get_device() -> Any:
     if torch.cuda.is_available():
         return torch.device("cuda")
     else:
         return torch.device("cpu")
 
 
-def fix_model_keys(state_dict):
+def fix_model_keys(state_dict: Any) -> Any:
     tmp = OrderedDict()
     for key in state_dict:
         if key.startswith("module."):
@@ -28,18 +29,18 @@ def fix_model_keys(state_dict):
 
 
 class SiameseNetwork(nn.Module):
-    def __init__(self, base_network):
+    def __init__(self, base_network: Any) -> None:
         super(SiameseNetwork, self).__init__()
         self.base_network = base_network
     
-    def forward(self, input1, input2):
+    def forward(self, input1: Any, input2: Any) -> Any:
         output1 = self.base_network(input1)["mol_prop"][:, 1:]
         output2 = self.base_network(input2)["mol_prop"][:, 1:]
         
         diff = (output2 - output1) * 23.061
         return diff
 
-def load_model(model_path):
+def load_model(model_path: Any) -> Any:
     floating_type = torch.double
 
     net = PhysDimeNet( n_atom_embedding=95,
@@ -96,7 +97,7 @@ def load_model(model_path):
     return siames_net
 
 
-def load_models(model_paths):
+def load_models(model_paths: Any) -> Any:
     models = [load_model(model_path) for model_path in model_paths]
     return models
 

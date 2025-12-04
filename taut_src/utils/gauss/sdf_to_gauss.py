@@ -1,13 +1,14 @@
+from typing import Any
 import os
 import os.path as osp
 from glob import glob
 
 
-def sdf_to_gauss(i, o, keyword):
+def sdf_to_gauss(i: Any, o: Any, keyword: Any) -> Any:
     os.system("obabel -isdf {} -ocom -xk {} -O {}".format(i, keyword, o))
 
 
-def main():
+def main() -> Any:
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("-i")

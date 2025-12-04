@@ -1,3 +1,4 @@
+from typing import Any
 import torch
 
 from taut_src.utils.BesselCalculator import bessel_expansion_raw, bessel_expansion_continuous
@@ -9,7 +10,7 @@ class BesselCalculator:
     """
     A faster implementation of bessel calculator
     """
-    def __init__(self, n_srbf, n_shbf, envelop_p, cos_theta=True):
+    def __init__(self, n_srbf: Any, n_shbf: Any, envelop_p: Any, cos_theta: Any=True) -> None:
         """
 
         :param n_srbf:
@@ -38,7 +39,7 @@ class BesselCalculator:
         self.Y_l[0] = lambda _theta: torch.zeros_like(_theta).fill_(float(Y_l[0][0]))
         self.to(get_device())
 
-    def cal_sbf(self, dist, angle, feature_dist):
+    def cal_sbf(self, dist: Any, angle: Any, feature_dist: Any) -> Any:
         scaled_dist = (dist/feature_dist).view(-1, 1, 1)
         expanded_dist = scaled_dist*self.z_ln
         radius_part = torch.cat([f(expanded_dist[:, [l], :]) for l, f in enumerate(self.j_l)], dim=1)
@@ -46,20 +47,20 @@ class BesselCalculator:
         result = self.normalizer_tensor.unsqueeze(0) * radius_part * angle_part.unsqueeze(-1)
         return result.view(-1, self.dim_sbf)
 
-    def cal_rbf(self, dist, feature_dist, n_rbf):
+    def cal_rbf(self, dist: Any, feature_dist: Any, n_rbf: Any) -> Any:
         if self.envelop_p > 0:
             return bessel_expansion_continuous(dist, n_rbf, feature_dist, self.envelop_p)
         else:
             return bessel_expansion_raw(dist, n_rbf, feature_dist)
 
-    def get_normal(self):
+    def get_normal(self) -> Any:
         normal = torch.zeros_like(self.z_ln)
         for l in range(self.n_shbf+1):
             for n in range(self.n_srbf):
                 normal[l][n] = torch.sqrt(2/(Jn(self.z_ln[l][n], l+1))**2)
         return normal
 
-    def to(self, _device):
+    def to(self, _device: Any) -> Any:
         self.z_ln = self.z_ln.to(_device)
         self.normalizer_tensor = self.normalizer_tensor.to(_device)
 

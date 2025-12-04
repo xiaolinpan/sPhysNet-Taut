@@ -1,3 +1,4 @@
+from typing import Any
 import torch
 import torch.nn.functional as F
 
@@ -14,7 +15,7 @@ n_features = 29
 hidden = 1024
 
 class GCNNet(torch.nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super(GCNNet, self).__init__()
         self.conv1 = GCNConv(n_features, 1024, cached=False) # if you defined cache=True, the shape of batch must be same!
         self.bn1 = BatchNorm1d(1024)
@@ -32,7 +33,7 @@ class GCNNet(torch.nn.Module):
         self.fc3 = Linear(128, 16)
         self.fc4 = Linear(16, 1)
 
-    def reset_parameters(self):
+    def reset_parameters(self) -> Any:
         self.conv1.reset_parameters()
         self.conv2.reset_parameters()
         self.conv3.reset_parameters()
@@ -44,7 +45,7 @@ class GCNNet(torch.nn.Module):
         self.fc3.reset_parameters()
         self.fc4.reset_parameters()
 
-    def forward(self, data):
+    def forward(self, data: Any) -> Any:
         x, edge_index, batch = data.x, data.edge_index, data.batch
         x = F.relu(self.conv1(x, edge_index))
         x = self.bn1(x)
@@ -64,7 +65,7 @@ class GCNNet(torch.nn.Module):
         return x
 
 class GATNet(torch.nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super(GATNet, self).__init__()
         self.conv1 = GATConv(n_features, 1024, heads=1) # if you defined cache=True, the shape of batch must be same!
         self.bn1 = BatchNorm1d(1024)
@@ -81,7 +82,7 @@ class GATNet(torch.nn.Module):
         self.fc3 = Linear(128, 16)
         self.fc4 = Linear(16, 1)
 
-    def forward(self, x, edge_index, batch):
+    def forward(self, x: Any, edge_index: Any, batch: Any) -> Any:
 
         x = F.relu(self.conv1(x, edge_index))
         x = self.bn1(x)
@@ -104,7 +105,7 @@ class GATNet(torch.nn.Module):
 
 dim = 64
 class MPNNNet(torch.nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super(MPNNNet, self).__init__()
         self.lin0 = torch.nn.Linear(n_features, dim)
 
@@ -116,7 +117,7 @@ class MPNNNet(torch.nn.Module):
         self.lin1 = torch.nn.Linear(2 * dim, dim)
         self.lin2 = torch.nn.Linear(dim, 1)
 
-    def forward(self, x, edge_index, edge_attr, batch):
+    def forward(self, x: Any, edge_index: Any, edge_attr: Any, batch: Any) -> Any:
         out = F.relu(self.lin0(x))
         h = out.unsqueeze(0)
 

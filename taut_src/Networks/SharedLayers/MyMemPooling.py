@@ -1,3 +1,4 @@
+from typing import Any
 import torch_geometric
 from torch_geometric.nn.pool import MemPooling
 import torch
@@ -7,7 +8,7 @@ from taut_src.Networks.PhysLayers.PhysModule import OutputLayer
 
 
 class MyMemPooling(nn.Module):
-    def __init__(self, in_channels, n_output, extra_readout=False, **options):
+    def __init__(self, in_channels: Any, n_output: Any, extra_readout: Any=False, **options: Any) -> None:
         super(MyMemPooling, self).__init__()
         self.extra_readout = extra_readout
         self.n_output = n_output
@@ -20,7 +21,7 @@ class MyMemPooling(nn.Module):
             self.pool = MemPooling(in_channels, n_output, **options)
             self.read_out = None
 
-    def forward(self, **kwargs):
+    def forward(self, **kwargs: Any) -> Any:
         out: torch.Tensor = self.pool(kwargs["vi"], kwargs["atom_mol_batch"])[0]
         out = torch.squeeze(out, dim=1)
         if self.read_out is not None:

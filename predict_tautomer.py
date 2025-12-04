@@ -1,3 +1,4 @@
+from typing import Any
 import warnings
 warnings.filterwarnings("ignore")
 from itertools import product
@@ -18,7 +19,7 @@ import argparse
 
 un = rdMolStandardize.Uncharger()
 
-def str2bool(v):
+def str2bool(v: Any) -> Any:
     if isinstance(v, bool):
         return v
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
@@ -28,7 +29,7 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
     
-def is_need_mol(mol, element_list=[1, 6, 7, 8, 9, 15, 16, 17]):
+def is_need_mol(mol: Any, element_list: Any=[1, 6, 7, 8, 9, 15, 16, 17]) -> Any:
     if mol is not None:
         elements = all(
             [at.GetAtomicNum() in element_list for at in mol.GetAtoms()])
@@ -38,7 +39,7 @@ def is_need_mol(mol, element_list=[1, 6, 7, 8, 9, 15, 16, 17]):
             return False
 
 
-def get_lower_energy_tauts(smi, energy_range, num_confs):
+def get_lower_energy_tauts(smi: Any, energy_range: Any, num_confs: Any) -> Any:
     vmrs = enumerate_vmrs(smi)
 
     data = namedtuple("lowerEnergyTauts", "smi smirks_index energy lower")
@@ -81,7 +82,7 @@ def get_lower_energy_tauts(smi, energy_range, num_confs):
     return lower_energy_tauts
 
 
-def combine_lower_energy_tauts(lower_energy_tauts):
+def combine_lower_energy_tauts(lower_energy_tauts: Any) -> Any:
     tauts_product = list(product(*lower_energy_tauts))
     lower_energy_mols, upper_energy_mols = [], []
     for tauts in tauts_product:
@@ -99,7 +100,7 @@ def combine_lower_energy_tauts(lower_energy_tauts):
     return lower_energy_mols, upper_energy_mols
 
 
-def match_bonds(mm):
+def match_bonds(mm: Any) -> Any:
     tsmarts = ["[#6+0;!$(*=,#[!#6])]!@!=!#[!#0;!#1;!X1;!$([NH,NH2,OH,SH]-[*;r]);!$(*=,#[*;!R])]"]
     tpatterns = [Chem.MolFromSmarts(tsm) for tsm in tsmarts]
     matches = []
@@ -109,7 +110,7 @@ def match_bonds(mm):
     return matches
 
 
-def match_atoms(mm):
+def match_atoms(mm: Any) -> Any:
     fsmarts = ["[$([#6]([F,Cl])-[*;r])]"]
     fpatterns = [Chem.MolFromSmarts(fsm) for fsm in fsmarts]
     fatom_idxs = []
@@ -120,7 +121,7 @@ def match_atoms(mm):
     return fatom_idxs
 
 
-def is_cut_mol(mm):
+def is_cut_mol(mm: Any) -> Any:
     bonds_idxs = match_bonds(mm)
     atom_idxs = match_atoms(mm)
 
@@ -137,7 +138,7 @@ def is_cut_mol(mm):
         return True
 
 
-def generate_tautomer_cutmol(smi, num_confs, energy_range):
+def generate_tautomer_cutmol(smi: Any, num_confs: Any, energy_range: Any) -> Any:
     lower_energy_tauts = get_lower_energy_tauts(
         smi,
         energy_range,
@@ -156,7 +157,7 @@ def generate_tautomer_cutmol(smi, num_confs, energy_range):
     return dfs_res_lower, dfs_res_upper
 
 
-def generate_tautomer_non_cutmol(mm, num_confs, energy_range):
+def generate_tautomer_non_cutmol(mm: Any, num_confs: Any, energy_range: Any) -> Any:
     tauts = enumerate_tauts(mm)
     df_res = rank_tauts(tauts, num_confs, is_fragment=False)
     df_res = df_res.iloc[:, [0, 1]]
@@ -173,7 +174,7 @@ def generate_tautomer_non_cutmol(mm, num_confs, energy_range):
     return dfs_res_lower, dfs_res_upper
 
 
-def func(smi, cutmol, energy_range=2.8, ionization=True, ph=7.0, tph=1.0, num_confs=3):
+def func(smi: Any, cutmol: Any, energy_range: Any=2.8, ionization: Any=True, ph: Any=7.0, tph: Any=1.0, num_confs: Any=3) -> Any:
     mm = Chem.MolFromSmiles(smi)
     mm = un.uncharge(mm)
     mm = Chem.MolFromSmiles(Chem.MolToSmiles(mm))
@@ -194,7 +195,7 @@ def func(smi, cutmol, energy_range=2.8, ionization=True, ph=7.0, tph=1.0, num_co
     return dfs_res_lower, dfs_res_upper
 
 
-def generate_conf(smi):
+def generate_conf(smi: Any) -> Any:
     mol = Chem.MolFromSmiles(smi)
     mol = Chem.AddHs(mol)
 
@@ -205,7 +206,7 @@ def generate_conf(smi):
     return mol, cids
 
 
-def write_file(datas, sdf_path, ionization):
+def write_file(datas: Any, sdf_path: Any, ionization: Any) -> Any:
     conf_data = []
     for data in datas:
         tsmi = data['tsmi']
@@ -238,7 +239,7 @@ def write_file(datas, sdf_path, ionization):
     return
 
 
-def construct_data(dfs, label, ionization):
+def construct_data(dfs: Any, label: Any, ionization: Any) -> Any:
     datas = []
     for idx, row in dfs.iterrows():
         tsmi = row[0]
@@ -256,7 +257,7 @@ def construct_data(dfs, label, ionization):
     return datas
 
 
-def get_taut_data(smi, cutmol, num_confs, energy_cutoff, ionization, ph, tph):
+def get_taut_data(smi: Any, cutmol: Any, num_confs: Any, energy_cutoff: Any, ionization: Any, ph: Any, tph: Any) -> Any:
     dfs_res_lower, dfs_res_upper = func(
         smi,
         cutmol=cutmol,
@@ -278,7 +279,7 @@ def get_taut_data(smi, cutmol, num_confs, energy_cutoff, ionization, ph, tph):
     return fdatas
 
 
-def run():
+def run() -> Any:
     parser = argparse.ArgumentParser(
         description='To calculate low-energy tautomeric states for small molecules by a deep learning model.')
     parser.add_argument(

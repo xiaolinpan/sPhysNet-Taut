@@ -1,3 +1,4 @@
+from typing import Any
 import math
 import os
 import torch
@@ -7,7 +8,7 @@ from taut_src.utils.basis_utils import bessel_basis, real_sph_harm
 from taut_src.utils.utils_functions import get_device
 
 
-def _cutoff_fn(D, cutoff):
+def _cutoff_fn(D: Any, cutoff: Any) -> Any:
     """
     Private function called by rbf_expansion(D, K=64, cutoff=10)
     """
@@ -20,7 +21,7 @@ def _cutoff_fn(D, cutoff):
     return result
 
 
-def rbf_expansion_phynet(D, centers, widths, cutoff):
+def rbf_expansion_phynet(D: Any, centers: Any, widths: Any, cutoff: Any) -> Any:
     """
     The rbf expansion of a distance
     Input D: matrix that contains the distance between to atoms
@@ -32,7 +33,7 @@ def rbf_expansion_phynet(D, centers, widths, cutoff):
     return rbf
 
 
-def bessel_expansion_raw(dist, numbers, cutoff):
+def bessel_expansion_raw(dist: Any, numbers: Any, cutoff: Any) -> Any:
     """
     Bessel expansion function WITHOUT continuous cutoff
     :param dist:
@@ -44,19 +45,19 @@ def bessel_expansion_raw(dist, numbers, cutoff):
     return math.sqrt(2.0 / cutoff) * torch.sin(n_rbf * dist * math.pi / cutoff) / dist
 
 
-def bessel_expansion_continuous(dist, numbers, cutoff, p=6):
+def bessel_expansion_continuous(dist: Any, numbers: Any, cutoff: Any, p: Any=6) -> Any:
     cutoff = torch.Tensor([cutoff]).type(dist.type())
     continuous_cutoff = _cutoff_fn_bessel(dist / cutoff, cutoff, p)
     return bessel_expansion_raw(dist, numbers, cutoff) * continuous_cutoff
 
 
-def _cutoff_fn_bessel(d_expanded, cutoff, p):
+def _cutoff_fn_bessel(d_expanded: Any, cutoff: Any, p: Any) -> Any:
     p = torch.Tensor([p]).type(d_expanded.type())
     return 1 - (p + 1) * d_expanded.pow(p) + p * d_expanded.pow(p + 1.0)
 
 
 class BesselCalculator:
-    def __init__(self, n_srbf, n_shbf):
+    def __init__(self, n_srbf: Any, n_shbf: Any) -> None:
         """
 
         :param n_srbf: number of radius expansion for Bessel function: used in a_ijk
@@ -89,10 +90,10 @@ class BesselCalculator:
             # Not working right now
             # torch.save(self._funcs, fn_path)
 
-    def _get_file_name(self):
+    def _get_file_name(self) -> Any:
         return 'bessel_fns_{}_{}.npy'.format(self.n_srbf, self.n_shbf)
 
-    def cal_sbf(self, dist, angle, feature_dist):
+    def cal_sbf(self, dist: Any, angle: Any, feature_dist: Any) -> Any:
         # t0 = time.time()
 
         sbf = [f(dist/feature_dist, angle).view(-1, 1) for f in self._funcs]
@@ -105,11 +106,11 @@ class BesselCalculator:
         return sbf
 
     @staticmethod
-    def cal_rbf(dist, feature_dist, n_rbf):
+    def cal_rbf(dist: Any, feature_dist: Any, n_rbf: Any) -> Any:
         return bessel_expansion_raw(dist, n_rbf, feature_dist)
 
 
-def _plot_n_save():
+def _plot_n_save() -> Any:
     """
     internal use only
     :return:

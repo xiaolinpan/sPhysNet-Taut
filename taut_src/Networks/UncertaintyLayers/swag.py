@@ -1,3 +1,4 @@
+from typing import Any
 import torch
 import numpy as np
 import itertools
@@ -5,12 +6,12 @@ from torch.distributions.normal import Normal
 import copy
 
 
-def flatten(lst):
+def flatten(lst: Any) -> Any:
     tmp = [i.contiguous().view(-1, 1) for i in lst]
     return torch.cat(tmp).view(-1)
 
 
-def unflatten_like(vector, likeTensorList):
+def unflatten_like(vector: Any, likeTensorList: Any) -> Any:
     # Takes a flat torch.tensor and unflattens it to a list of torch.tensors
     #    shaped like likeTensorList
     outList = []
@@ -31,7 +32,7 @@ def unflatten_like(vector, likeTensorList):
 # from ..utils import flatten, unflatten_like
 
 
-def swag_parameters(module, params, no_cov_mat=True):
+def swag_parameters(module: Any, params: Any, no_cov_mat: Any=True) -> Any:
     for name in list(module._parameters.keys()):
         if module._parameters[name] is None:
             continue
@@ -48,7 +49,7 @@ def swag_parameters(module, params, no_cov_mat=True):
         params.append((module, name))
 
 
-def get_parameters(module, params):
+def get_parameters(module: Any, params: Any) -> Any:
     for name in list(module._parameters.keys()):
         # print(name)
         if module._parameters[name] is None:
@@ -60,8 +61,8 @@ def get_parameters(module, params):
 
 class SWAG(torch.nn.Module):
     def __init__(
-            self, model, no_cov_mat=True, max_num_models=20, var_clamp=1e-30
-    ):
+            self, model: Any, no_cov_mat: Any=True, max_num_models: Any=20, var_clamp: Any=1e-30
+    ) -> None:
         import gpytorch
         from gpytorch.lazy import RootLazyTensor, DiagLazyTensor, AddedDiagLazyTensor
         from gpytorch.distributions import MultivariateNormal
@@ -83,10 +84,10 @@ class SWAG(torch.nn.Module):
             )
         )
 
-    def forward(self, *args, **kwargs):
+    def forward(self, *args: Any, **kwargs: Any) -> Any:
         return self.model(*args, **kwargs)
 
-    def sample(self, scale=1.0, cov=False, seed=None, block=False, fullrank=True):
+    def sample(self, scale: Any=1.0, cov: Any=False, seed: Any=None, block: Any=False, fullrank: Any=True) -> Any:
         if seed is not None:
             torch.manual_seed(seed)
 
@@ -95,7 +96,7 @@ class SWAG(torch.nn.Module):
         else:
             self.sample_blockwise(scale, cov, fullrank)
 
-    def sample_blockwise(self, scale, cov, fullrank):
+    def sample_blockwise(self, scale: Any, cov: Any, fullrank: Any) -> Any:
         for module, name in self.params:
             mean = module.__getattr__("%s_mean" % name)
 
@@ -123,7 +124,7 @@ class SWAG(torch.nn.Module):
 
             module.__setattr__(name, w)
 
-    def sample_fullrank(self, scale, cov, fullrank):
+    def sample_fullrank(self, scale: Any, cov: Any, fullrank: Any) -> Any:
         scale_sqrt = scale ** 0.5
 
         mean_list = []
@@ -175,7 +176,7 @@ class SWAG(torch.nn.Module):
         for (module, name), sample in zip(self.params, samples_list):
             module.__setattr__(name, sample.cuda())
 
-    def collect_model(self, base_model):
+    def collect_model(self, base_model: Any) -> Any:
         base_params = list()
         base_model.apply(lambda module: get_parameters(module, base_params))
 
@@ -210,7 +211,7 @@ class SWAG(torch.nn.Module):
             module.__setattr__("%s_sq_mean" % name, sq_mean)
         self.n_models.add_(1)
 
-    def load_state_dict(self, state_dict, strict=True):
+    def load_state_dict(self, state_dict: Any, strict: Any=True) -> Any:
         if not self.no_cov_mat:
             n_models = state_dict["n_models"].item()
             rank = min(n_models, self.max_num_models)
@@ -222,7 +223,7 @@ class SWAG(torch.nn.Module):
                 )
         super(SWAG, self).load_state_dict(state_dict, strict)
 
-    def export_numpy_params(self, export_cov_mat=False):
+    def export_numpy_params(self, export_cov_mat: Any=False) -> Any:
         mean_list = []
         sq_mean_list = []
         cov_mat_list = []
@@ -245,7 +246,7 @@ class SWAG(torch.nn.Module):
         else:
             return mean, var
 
-    def import_numpy_weights(self, w):
+    def import_numpy_weights(self, w: Any) -> Any:
         k = 0
         for module, name in self.params:
             mean = module.__getattr__("%s_mean" % name)
@@ -253,7 +254,7 @@ class SWAG(torch.nn.Module):
             module.__setattr__(name, mean.new_tensor(w[k: k + s].reshape(mean.shape)))
             k += s
 
-    def generate_mean_var_covar(self):
+    def generate_mean_var_covar(self) -> Any:
         mean_list = []
         var_list = []
         cov_mat_root_list = []
@@ -267,7 +268,7 @@ class SWAG(torch.nn.Module):
             cov_mat_root_list.append(cov_mat_sqrt)
         return mean_list, var_list, cov_mat_root_list
 
-    def compute_ll_for_block(self, vec, mean, var, cov_mat_root):
+    def compute_ll_for_block(self, vec: Any, mean: Any, var: Any, cov_mat_root: Any) -> Any:
         vec = flatten(vec)
         mean = flatten(mean)
         var = flatten(var)
@@ -282,7 +283,7 @@ class SWAG(torch.nn.Module):
         ) and gpytorch.settings.max_cg_iterations(25):
             return qdist.log_prob(vec)
 
-    def block_logdet(self, var, cov_mat_root):
+    def block_logdet(self, var: Any, cov_mat_root: Any) -> Any:
         var = flatten(var)
 
         cov_mat_lt = RootLazyTensor(cov_mat_root.t())
@@ -291,7 +292,7 @@ class SWAG(torch.nn.Module):
 
         return covar_lt.log_det()
 
-    def block_logll(self, param_list, mean_list, var_list, cov_mat_root_list):
+    def block_logll(self, param_list: Any, mean_list: Any, var_list: Any, cov_mat_root_list: Any) -> Any:
         full_logprob = 0
         for i, (param, mean, var, cov_mat_root) in enumerate(
                 zip(param_list, mean_list, var_list, cov_mat_root_list)
@@ -302,7 +303,7 @@ class SWAG(torch.nn.Module):
 
         return full_logprob
 
-    def full_logll(self, param_list, mean_list, var_list, cov_mat_root_list):
+    def full_logll(self, param_list: Any, mean_list: Any, var_list: Any, cov_mat_root_list: Any) -> Any:
         cov_mat_root = torch.cat(cov_mat_root_list, dim=1)
         mean_vector = flatten(mean_list)
         var_vector = flatten(var_list)
@@ -311,7 +312,7 @@ class SWAG(torch.nn.Module):
             param_vector, mean_vector, var_vector, cov_mat_root
         )
 
-    def compute_logdet(self, block=False):
+    def compute_logdet(self, block: Any=False) -> Any:
         _, var_list, covar_mat_root_list = self.generate_mean_var_covar()
 
         if block:
@@ -326,13 +327,13 @@ class SWAG(torch.nn.Module):
 
         return full_logdet
 
-    def diag_logll(self, param_list, mean_list, var_list):
+    def diag_logll(self, param_list: Any, mean_list: Any, var_list: Any) -> Any:
         logprob = 0.0
         for param, mean, scale in zip(param_list, mean_list, var_list):
             logprob += Normal(mean, scale).log_prob(param).sum()
         return logprob
 
-    def compute_logprob(self, vec=None, block=False, diag=False):
+    def compute_logprob(self, vec: Any=None, block: Any=False, diag: Any=False) -> Any:
         mean_list, var_list, covar_mat_root_list = self.generate_mean_var_covar()
 
         if vec is None:

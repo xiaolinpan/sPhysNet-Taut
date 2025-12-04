@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from typing import Any
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit import RDLogger
@@ -21,13 +22,13 @@ root = osp.abspath(osp.dirname(__file__))
 #root = os.path.split(os.path.realpath(__file__))[0]
 #print ('root',root)
 
-def load_model(model_file, device="cpu"):
+def load_model(model_file: Any, device: Any="cpu") -> Any:
     model= GCNNet().to(device)
     model.load_state_dict(torch.load(model_file, map_location=device))
     model.eval()
     return model
 
-def model_pred(m2, aid, model, device="cpu"):
+def model_pred(m2: Any, aid: Any, model: Any, device: Any="cpu") -> Any:
     data = mol2vec(m2, aid)
     with torch.no_grad():
         data = data.to(device)
@@ -36,7 +37,7 @@ def model_pred(m2, aid, model, device="cpu"):
         pka = pKa[0][0]
     return pka
 
-def predict_acid(mol):
+def predict_acid(mol: Any) -> Any:
     model_file = osp.join(root, "models/weight_acid.pth")
     model_acid = load_model(model_file)
 
@@ -47,7 +48,7 @@ def predict_acid(mol):
         acid_res.update({aid:apka})
     return acid_res
 
-def predict_base(mol):
+def predict_base(mol: Any) -> Any:
     model_file = osp.join(root, "models/weight_base.pth")
     model_base = load_model(model_file)
 
@@ -58,7 +59,7 @@ def predict_base(mol):
         base_res.update({aid:bpka})
     return base_res
 
-def predict(mol, uncharged=True):
+def predict(mol: Any, uncharged: Any=True) -> Any:
     if uncharged:
         un = rdMolStandardize.Uncharger()
         mol = un.uncharge(mol)

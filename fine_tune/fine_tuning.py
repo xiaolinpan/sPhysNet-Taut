@@ -2,6 +2,7 @@
 # coding: utf-8
 
 
+from typing import Any
 import os, sys
 module_path = os.path.abspath(os.path.join('..'))  # 获取上一级目录
 sys.path.append(module_path)
@@ -40,7 +41,7 @@ from rdkit.Chem import AllChem
 
 _force_cpu = False
 
-def fix_model_keys(state_dict):
+def fix_model_keys(state_dict: Any) -> Any:
     tmp = OrderedDict()
     for key in state_dict:
         if key.startswith("module."):
@@ -54,27 +55,27 @@ def fix_model_keys(state_dict):
     return tmp
 
 
-def get_coords(pmol):
+def get_coords(pmol: Any) -> Any:
     coords = []
     for atom in pmol.atoms:
         coords.append(atom.coords)
     return np.array(coords)
 
-def get_elements(pmol):
+def get_elements(pmol: Any) -> Any:
     z = []
     for atom in pmol.atoms:
         z.append(atom.atomicnum)
     return np.array(z)
 
 
-def get_device():
+def get_device() -> Any:
     if torch.cuda.is_available():
         return torch.device("cuda")
     else:
         return torch.device("cpu")
     
 
-def set_force_cpu():
+def set_force_cpu() -> Any:
     """
     ONLY use it when pre-processing data
     :return:
@@ -83,7 +84,7 @@ def set_force_cpu():
     _force_cpu = True
 
 
-def _get_index_from_matrix(num, previous_num):
+def _get_index_from_matrix(num: Any, previous_num: Any) -> Any:
     """
     get the fully-connect graph edge index compatible with torch_geometric message passing module
     eg: when num = 3, will return:
@@ -100,7 +101,7 @@ def _get_index_from_matrix(num, previous_num):
     return index[:, mask] + previous_num
 
 
-def cal_edge(R, N, prev_N, edge_index, cal_coulomb=True, short_range=True):
+def cal_edge(R: Any, N: Any, prev_N: Any, edge_index: Any, cal_coulomb: Any=True, short_range: Any=True) -> Any:
     """
     calculate edge distance from edge_index;
     if cal_coulomb is True, additional edge will be calculated without any restriction
@@ -140,7 +141,7 @@ def cal_edge(R, N, prev_N, edge_index, cal_coulomb=True, short_range=True):
     return coulomb_dist, coulomb_index, short_range_dist, short_range_index
 
 
-def scale_R(R):
+def scale_R(R: Any) -> Any:
     abs_min = torch.abs(R).min()
     while abs_min < 1e-3:
         R = R - 1
@@ -148,7 +149,7 @@ def scale_R(R):
     return R
 
 
-def cal_msg_edge_index(edge_index):
+def cal_msg_edge_index(edge_index: Any) -> Any:
     msg_id_1 = torch.arange(edge_index.shape[-1]).repeat(edge_index.shape[-1], 1)
     msg_id_0 = msg_id_1.t()
     source_atom = edge_index[0, :].repeat(edge_index.shape[-1], 1)
@@ -158,7 +159,7 @@ def cal_msg_edge_index(edge_index):
     return result
 
 
-def voronoi_edge_index(R, boundary_factor, use_center):
+def voronoi_edge_index(R: Any, boundary_factor: Any, use_center: Any) -> Any:
     """
     Calculate Voronoi Diagram
     :param R: shape[-1, 3], the location of input points
@@ -195,7 +196,7 @@ def voronoi_edge_index(R, boundary_factor, use_center):
     return edge_index
 
 
-def sort_edge(edge_index):
+def sort_edge(edge_index: Any) -> Any:
     """
     sort the target of edge to be sequential, which may increase computational efficiency later on when training
     :param edge_index:
@@ -205,7 +206,7 @@ def sort_edge(edge_index):
     return edge_index[:, arg_sort]
 
 
-def mol_to_edge_index(mol):
+def mol_to_edge_index(mol: Any) -> Any:
     """
     Calculate edge_index(bonding edge) from rdkit.mol
     :param mol:
@@ -222,7 +223,7 @@ def mol_to_edge_index(mol):
     return _edge_index
 
 
-def remove_bonding_edge(all_edge_index, bond_edge_index):
+def remove_bonding_edge(all_edge_index: Any, bond_edge_index: Any) -> Any:
     """
     Remove bonding idx_name from atom_edge_index to avoid double counting
     :param all_edge_index:
@@ -238,7 +239,7 @@ def remove_bonding_edge(all_edge_index, bond_edge_index):
     return all_edge_index[:, remain_mask]
 
 
-def extend_bond(edge_index):
+def extend_bond(edge_index: Any) -> Any:
     """
     extend bond edge to a next degree, i.e. consider all 1,3 interaction as bond
     :param edge_index:
@@ -269,9 +270,9 @@ def extend_bond(edge_index):
     return result
 
 
-def name_extender(name, cal_3body_term=None, edge_version=None, cutoff=None, boundary_factor=None, use_center=None,
-                  bond_atom_sep=None, record_long_range=False, type_3_body='B', extended_bond=False, no_ext=False,
-                  geometry='QM'):
+def name_extender(name: Any, cal_3body_term: Any=None, edge_version: Any=None, cutoff: Any=None, boundary_factor: Any=None, use_center: Any=None,
+                  bond_atom_sep: Any=None, record_long_range: Any=False, type_3_body: Any='B', extended_bond: Any=False, no_ext: Any=False,
+                  geometry: Any='QM') -> Any:
     if extended_bond:
         type_3_body = type_3_body + 'Ext'
     name += '-' + type_3_body
@@ -309,8 +310,8 @@ def name_extender(name, cal_3body_term=None, edge_version=None, cutoff=None, bou
 sol_keys = ["gasEnergy", "watEnergy", "octEnergy", "CalcSol", "CalcOct", "calcLogP"]
 
 
-def my_pre_transform(data, edge_version, do_sort_edge, cal_efg, cutoff, boundary_factor, use_center, mol,
-                     cal_3body_term, bond_atom_sep, record_long_range, type_3_body='B', extended_bond=False):
+def my_pre_transform(data: Any, edge_version: Any, do_sort_edge: Any, cal_efg: Any, cutoff: Any, boundary_factor: Any, use_center: Any, mol: Any,
+                     cal_3body_term: Any, bond_atom_sep: Any, record_long_range: Any, type_3_body: Any='B', extended_bond: Any=False) -> Any:
     """
     edge calculation
     atom_edge_index is non-bonding edge idx_name when bond_atom_sep=True; Otherwise, it is bonding and non-bonding together
@@ -400,13 +401,13 @@ def my_pre_transform(data, edge_version, do_sort_edge, cal_efg, cutoff, boundary
     return data
 
 
-def extract_mol_by_confId(mol, confId):
+def extract_mol_by_confId(mol: Any, confId: Any) -> Any:
     mol_block = Chem.MolToMolBlock(mol, confId=confId)
     mol = Chem.MolFromMolBlock(mol_block, removeHs=False)
     return mol
 
 
-def generate_confs(smi, numConfs=1):
+def generate_confs(smi: Any, numConfs: Any=1) -> Any:
     mol = Chem.MolFromSmiles(smi)
     mol = AllChem.AddHs(mol)
     
@@ -424,7 +425,7 @@ def generate_confs(smi, numConfs=1):
     return confs
 
 
-def optimize(mol):
+def optimize(mol: Any) -> Any:
     mp = AllChem.MMFFGetMoleculeProperties(mol, mmffVariant='MMFF94')
     ff = AllChem.MMFFGetMoleculeForceField(mol, mp, confId=0)
     ff.Initialize()
@@ -433,7 +434,7 @@ def optimize(mol):
     return E
 
 
-def get_low_energy_conf(smi, num_confs):
+def get_low_energy_conf(smi: Any, num_confs: Any) -> Any:
     mol_confs = generate_confs(smi, num_confs)
     data = []
     for m in mol_confs:
@@ -446,7 +447,7 @@ def get_low_energy_conf(smi, num_confs):
     return pmol
 
 
-def calc_data( smi ):
+def calc_data( smi: Any ) -> Any:
     pmol = get_low_energy_conf(smi, num_confs=300)
    
     coords = get_coords(pmol)
@@ -467,7 +468,7 @@ def calc_data( smi ):
     return nthis_data
     
    
-def get_dft_pmol(name, index):
+def get_dft_pmol(name: Any, index: Any) -> Any:
     fname = name + "_t" + str(index)
     dff = df_gas[df_gas["name"] == fname]
     E_gas = dff.iloc[0, 1]
@@ -475,25 +476,25 @@ def get_dft_pmol(name, index):
 
 
 class EmaAmsGrad(torch.optim.Adam):
-    def __init__(self, training_model: torch.nn.Module, lr=1e-3, betas=(0.9, 0.99),
-                 eps=1e-8, weight_decay=0, ema=0.999, shadow_dict=None):
+    def __init__(self, training_model: torch.nn.Module, lr: Any=1e-3, betas: Any=(0.9, 0.99),
+                 eps: Any=1e-8, weight_decay: Any=0, ema: Any=0.999, shadow_dict: Any=None) -> None:
         super().__init__(filter(lambda p: p.requires_grad, training_model.parameters()), lr, betas, eps, weight_decay, amsgrad=True)
         # for initialization of shadow model
         self.shadow_dict = shadow_dict
         self.ema = ema
         self.training_model = training_model
 
-        def avg_fn(averaged_model_parameter, model_parameter, num_averaged):
+        def avg_fn(averaged_model_parameter: Any, model_parameter: Any, num_averaged: Any) -> Any:
             return ema * averaged_model_parameter + (1 - ema) * model_parameter
 
-        def avg_fn_deactivated(averaged_model_parameter, model_parameter, num_averaged):
+        def avg_fn_deactivated(averaged_model_parameter: Any, model_parameter: Any, num_averaged: Any) -> Any:
             return model_parameter
 
         self.deactivated = (ema < 0)
         self.shadow_model = AveragedModel(training_model, device=get_device(),
                                           avg_fn=avg_fn_deactivated if self.deactivated else avg_fn)
 
-    def step(self, closure=None):
+    def step(self, closure: Any=None) -> Any:
         # t0 = time.time()
 
         loss = super().step(closure)
@@ -510,11 +511,11 @@ class EmaAmsGrad(torch.optim.Adam):
 
 
 class SiameseNetwork(nn.Module):
-    def __init__(self, base_network):
+    def __init__(self, base_network: Any) -> None:
         super(SiameseNetwork, self).__init__()
         self.base_network = base_network
     
-    def forward(self, input1, input2):
+    def forward(self, input1: Any, input2: Any) -> Any:
         output1 = self.base_network(input1)["mol_prop"]
         output2 = self.base_network(input2)["mol_prop"]
         
@@ -522,7 +523,7 @@ class SiameseNetwork(nn.Module):
         return diff
 
 
-def load_model(model_path):
+def load_model(model_path: Any) -> Any:
     floating_type = torch.double
 
     net = PhysDimeNet( n_atom_embedding=95,
@@ -577,13 +578,13 @@ def load_model(model_path):
     return siamese_net
 
 
-def loss_fn(output, ddG):
+def loss_fn(output: Any, ddG: Any) -> Any:
     loss = F.l1_loss(output, ddG)
     return loss
 
 
 @torch.no_grad()
-def valid_fn(data_loader, model):
+def valid_fn(data_loader: Any, model: Any) -> Any:
     model.eval()
 
     trues, preds = [], []
@@ -603,12 +604,12 @@ def valid_fn(data_loader, model):
     return Rp, r2, all_mae, all_rmse
 
 
-def train_step( data1, 
-                data2, 
-                ddG_gas, 
-                ddG_water, 
-                model,
-                optimizer):
+def train_step( data1: Any, 
+                data2: Any, 
+                ddG_gas: Any, 
+                ddG_water: Any, 
+                model: Any,
+                optimizer: Any) -> Any:
     optimizer.zero_grad()
     
     data1 = data1.to(get_device())
@@ -623,7 +624,7 @@ def train_step( data1,
     return loss
 
 
-def init_model(model_path):
+def init_model(model_path: Any) -> Any:
     siamese_net = load_model( model_path )
     
     for param in siamese_net.parameters():
@@ -634,7 +635,7 @@ def init_model(model_path):
     return siamese_net
 
 
-def split_dataset(dataset):
+def split_dataset(dataset: Any) -> Any:
     set_0, set_1, set_2, set_3 = [], [], [], []
     for pair in dataset:
         set_0.append( pair[0] )
@@ -645,21 +646,21 @@ def split_dataset(dataset):
 
 
 class PairDataset(torch.utils.data.Dataset):
-    def __init__(self, datasetA, datasetB, datasetC, datasetD):
+    def __init__(self, datasetA: Any, datasetB: Any, datasetC: Any, datasetD: Any) -> None:
         self.datasetA = datasetA
         self.datasetB = datasetB
         self.datasetC = datasetC
         self.datasetD = datasetD
         
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: Any) -> Any:
         return self.datasetA[idx], self.datasetB[idx], self.datasetC[idx], self.datasetD[idx]
 
-    def __len__(self):
+    def __len__(self) -> Any:
             return len(self.datasetA)
 
 
-def collate(data_list):
+def collate(data_list: Any) -> Any:
     batchA = Batch.from_data_list([data[0] for data in data_list])
     batchB = Batch.from_data_list([data[1] for data in data_list])
     batchC = Batch.from_data_list([data[2] for data in data_list])
@@ -667,7 +668,7 @@ def collate(data_list):
     return batchA, batchB, batchC, batchD
 
 
-def construct_pair_dataloader(dataset, batch_size, shuffle):
+def construct_pair_dataloader(dataset: Any, batch_size: Any, shuffle: Any) -> Any:
     set_0, set_1, set_2, set_3 = split_dataset( dataset )
     pair_dataset = PairDataset( set_0, set_1, set_2, set_3 )
 
@@ -679,7 +680,7 @@ def construct_pair_dataloader(dataset, batch_size, shuffle):
     return loader
 
 
-def prepare_dataloader( df,  batch_size, shuffle ):
+def prepare_dataloader( df: Any,  batch_size: Any, shuffle: Any ) -> Any:
     datasets = []
     for idx, name, smi1, smi2, ddG_w in df.itertuples():
        nthis_data1 = calc_data(smi1)

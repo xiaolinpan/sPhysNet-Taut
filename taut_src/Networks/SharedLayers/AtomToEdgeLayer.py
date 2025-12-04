@@ -1,3 +1,4 @@
+from typing import Any
 import torch
 import torch.nn as nn
 
@@ -5,14 +6,14 @@ from taut_src.Networks.SharedLayers.ActivationFns import activation_getter
 
 
 class AtomToEdgeLayer(nn.Module):
-    def __init__(self, dim_rbf, dim_edge, activation):
+    def __init__(self, dim_rbf: Any, dim_edge: Any, activation: Any) -> None:
         super().__init__()
         self.lin_rbf = nn.Linear(dim_rbf, dim_edge)
         self.lin_concat = nn.Linear(dim_edge * 3, dim_edge)
 
         self.activation = activation_getter(activation)
 
-    def forward(self, input_dict):
+    def forward(self, input_dict: Any) -> Any:
         atom_attr = input_dict["vi"]
         edge_index = input_dict["edge_index"]
         rbf = input_dict["edge_attr"]["rbf"]

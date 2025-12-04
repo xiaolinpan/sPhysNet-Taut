@@ -1,3 +1,4 @@
+from typing import Any
 import os
 import numpy as np
 import torch
@@ -41,7 +42,7 @@ d3_r2r4 = torch.Tensor(_d3_r2r4).type(floating_type).to(device)
 d3_maxc = 5  # maximum number of coordination complexes
 
 
-def _smootherstep(r, cutoff):
+def _smootherstep(r: Any, cutoff: Any) -> Any:
     """
     computes a smooth step from 1 to 0 starting at 1 bohr
     before the cutoff
@@ -56,7 +57,7 @@ def _smootherstep(r, cutoff):
                        torch.where(r >= cutoff, torch.zeros_like(x), 6 * x5 - 15 * x4 + 10 * x3))
 
 
-def _ncoord(Zi, Zj, r, idx_i, cutoff=None, k1=d3_k1, rcov=d3_rcov):
+def _ncoord(Zi: Any, Zj: Any, r: Any, idx_i: Any, cutoff: Any=None, k1: Any=d3_k1, rcov: Any=d3_rcov) -> Any:
     """
     compute coordination numbers by adding an inverse damping function
     """
@@ -69,7 +70,7 @@ def _ncoord(Zi, Zj, r, idx_i, cutoff=None, k1=d3_k1, rcov=d3_rcov):
     # return torch_geometric.utils.scatter_('add', damp, idx_i)
 
 
-def _getc6(ZiZj, nci, ncj, c6ab=d3_c6ab, k3=d3_k3):
+def _getc6(ZiZj: Any, nci: Any, ncj: Any, c6ab: Any=d3_c6ab, k3: Any=d3_k3) -> Any:
     """
     interpolate c6
     """
@@ -116,9 +117,9 @@ def _getc6(ZiZj, nci, ncj, c6ab=d3_c6ab, k3=d3_k3):
     return c6
 
 
-def edisp(Z, r, idx_i, idx_j, cutoff=None, r2=None,
-          r6=None, r8=None, s6=d3_s6, s8=d3_s8, a1=d3_a1, a2=d3_a2, k1=d3_k1, k2=d3_k2,
-          k3=d3_k3, c6ab=d3_c6ab, r0ab=d3_r0ab, rcov=d3_rcov, r2r4=d3_r2r4):
+def edisp(Z: Any, r: Any, idx_i: Any, idx_j: Any, cutoff: Any=None, r2: Any=None,
+          r6: Any=None, r8: Any=None, s6: Any=d3_s6, s8: Any=d3_s8, a1: Any=d3_a1, a2: Any=d3_a2, k1: Any=d3_k1, k2: Any=d3_k2,
+          k3: Any=d3_k3, c6ab: Any=d3_c6ab, r0ab: Any=d3_r0ab, rcov: Any=d3_rcov, r2r4: Any=d3_r2r4) -> Any:
     """
     compute d3 dispersion energy in Hartree
     r: distance in bohr!
@@ -171,7 +172,7 @@ def edisp(Z, r, idx_i, idx_j, cutoff=None, r2=None,
     return result
 
 
-def cal_d3_dispersion(Z, batch, edge_dist, edge_index, s6, s8, a1, a2):
+def cal_d3_dispersion(Z: Any, batch: Any, edge_dist: Any, edge_index: Any, s6: Any, s8: Any, a1: Any, a2: Any) -> Any:
     """
     calculate Grimme D3 dispersion energy
     :param Dist_matrix: in angstrom -> will be converted to Bohr

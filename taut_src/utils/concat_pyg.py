@@ -1,3 +1,4 @@
+from typing import Any
 import argparse
 import copy
 import glob
@@ -12,8 +13,8 @@ import torch
 import torch_geometric.data
 
 
-def concat_pyg(pygs: list = None, save_pyg: str = None, data_list=None, save_split=None, extend_load=False,
-               ref_csv=None, all_train=False, all_test=False, del_keys=None, **kwargs):
+def concat_pyg(pygs: list = None, save_pyg: str = None, data_list: Any=None, save_split: Any=None, extend_load: Any=False,
+               ref_csv: Any=None, all_train: Any=False, all_test: Any=False, del_keys: Any=None, **kwargs: Any) -> Any:
     train_index = []
     test_index = []
 
@@ -93,7 +94,7 @@ def concat_pyg(pygs: list = None, save_pyg: str = None, data_list=None, save_spl
     t0 = time.time()
 
 
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pygs", default=None)
     parser.add_argument("--pyg_folder", default=None)

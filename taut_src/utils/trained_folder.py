@@ -1,3 +1,4 @@
+from typing import Any
 import argparse
 import copy
 import glob
@@ -21,7 +22,7 @@ class TrainedFolder:
     """
     Load a trained folder for performance evaluation and other purposes
     """
-    def __init__(self, folder_name, config_folder=None):
+    def __init__(self, folder_name: Any, config_folder: Any=None) -> None:
         self.config_folder = config_folder
         self.folder_name = folder_name
 
@@ -38,11 +39,11 @@ class TrainedFolder:
         self.mae_fn = torch.nn.L1Loss(reduction='mean')
         self.mse_fn = torch.nn.MSELoss(reduction='mean')
 
-    def info(self, msg: str):
+    def info(self, msg: str) -> Any:
         self.logger.info(msg)
 
     @property
-    def model(self):
+    def model(self) -> Any:
         if self._model is None:
             use_swag = (self.args["uncertainty_modify"].split('_')[0] == 'swag')
             if use_swag:
@@ -61,7 +62,7 @@ class TrainedFolder:
         return self._model
 
     @property
-    def loss_fn(self):
+    def loss_fn(self) -> Any:
         if self._loss_fn is None:
             w_e, w_f, w_q, w_p = 1, self.args["force_weight"], self.args["charge_weight"], self.args["dipole_weight"]
             _loss_fn = LossFn(w_e=w_e, w_f=w_f, w_q=w_q, w_p=w_p, action=self.args["action"],
@@ -71,7 +72,7 @@ class TrainedFolder:
         return self._loss_fn
 
     @property
-    def args(self):
+    def args(self) -> Any:
         if self._args is None:
             _args = copy.deepcopy(self.args_raw)
 
@@ -92,7 +93,7 @@ class TrainedFolder:
         return self._args
 
     @property
-    def ds(self):
+    def ds(self) -> Any:
         if self._data_provider is None:
             _data_provider = ds_from_args(self.args_raw)
 
@@ -108,14 +109,14 @@ class TrainedFolder:
         return self._data_provider
 
     @property
-    def ds_test(self):
+    def ds_test(self) -> Any:
         if self._data_provider_test is None:
             # it was inited in self.data_provider
             __ = self.ds
         return self._data_provider_test
 
     @property
-    def args_raw(self):
+    def args_raw(self) -> Any:
         if self._args_raw is None:
             if self.config_folder is not None:
                 _args_raw, _config_name = read_folder_config(self.config_folder)
@@ -126,17 +127,17 @@ class TrainedFolder:
         return self._args_raw
 
     @property
-    def config_name(self):
+    def config_name(self) -> Any:
         if self._config_name is None:
             __ = self.args_raw
         return self._config_name
 
     @property
-    def save_root(self):
+    def save_root(self) -> Any:
         raise NotImplementedError
 
     @property
-    def logger(self):
+    def logger(self) -> Any:
         if self._logger is None:
             remove_handler()
             logging.basicConfig(filename=os.path.join(self.save_root, "test.log"),
@@ -147,7 +148,7 @@ class TrainedFolder:
         return self._logger
 
 
-def ds_from_args(args, rm_keys=True):
+def ds_from_args(args: Any, rm_keys: Any=True) -> Any:
     default_kwargs = {'root': args["data_root"], 'pre_transform': my_pre_transform, 'record_long_range': True,
                       'type_3_body': 'B', 'cal_3body_term': True}
     dataset_cls, _kwargs = data_provider_solver(args["data_provider"], default_kwargs)
@@ -171,7 +172,7 @@ def ds_from_args(args, rm_keys=True):
         return dataset
 
 
-def read_folder_config(folder_name):
+def read_folder_config(folder_name: Any) -> Any:
     # parse config file
     if osp.exists(osp.join(folder_name, "config-test.txt")):
         config_name = osp.join(folder_name, "config-test.txt")

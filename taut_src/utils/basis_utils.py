@@ -1,3 +1,4 @@
+from typing import Any
 import numpy as np
 from scipy.optimize import brentq
 from scipy import special as sp
@@ -6,14 +7,14 @@ from scipy import special as sp
 Code from paper "DIRECTIONAL MESSAGE PASSING FOR MOLECULAR GRAPHS"
 """
 
-def Jn(r, n):
+def Jn(r: Any, n: Any) -> Any:
     """
     numerical spherical bessel functions of order n
     """
     return np.sqrt(np.pi/(2*r)) * sp.jv(n+0.5, r)
 
 
-def Jn_zeros(n, k):
+def Jn_zeros(n: Any, k: Any) -> Any:
     """
     Compute the first k zeros of the spherical bessel functions up to order n (included)
     """
@@ -31,7 +32,7 @@ def Jn_zeros(n, k):
     return zerosj
 
 
-def spherical_bessel_formulas(n):
+def spherical_bessel_formulas(n: Any) -> Any:
     """
     Computes the sympy formulas for the spherical bessel functions up to order n (included)
     """
@@ -47,7 +48,7 @@ def spherical_bessel_formulas(n):
     return f
 
 
-def bessel_basis(n, k):
+def bessel_basis(n: Any, k: Any) -> Any:
     """
     Compute the sympy formulas for the normalized and rescaled spherical bessel functions up to
     order n (included) and maximum frequency k (excluded).
@@ -75,7 +76,7 @@ def bessel_basis(n, k):
     return bess_basis
 
 
-def sph_harm_prefactor(l, m):
+def sph_harm_prefactor(l: Any, m: Any) -> Any:
     """
     Computes the constant pre-factor for the spherical harmonic of degree l and order m
     input:
@@ -85,7 +86,7 @@ def sph_harm_prefactor(l, m):
     return ((2*l+1)*np.math.factorial(l-abs(m))/(4*np.pi*np.math.factorial(l+abs(m))))**0.5
 
 
-def associated_legendre_polynomials(l, zero_m_only=True):
+def associated_legendre_polynomials(l: Any, zero_m_only: Any=True) -> Any:
     """
     Computes sympy formulas of the associated legendre polynomials up to order l
     """
@@ -113,7 +114,7 @@ def associated_legendre_polynomials(l, zero_m_only=True):
     return P_l_m
 
 
-def real_sph_harm(l, zero_m_only=True, spherical_coordinates=True):
+def real_sph_harm(l: Any, zero_m_only: Any=True, spherical_coordinates: Any=True) -> Any:
     """
     Computes formula strings of the the real part of the spherical harmoncis up to order l.
     Variables are either cartesian coordinates x,y,z on the unit sphere or spherical coordinates phi and theta.
@@ -162,7 +163,7 @@ def real_sph_harm(l, zero_m_only=True, spherical_coordinates=True):
     return Y_func_l_m
 
 
-def Y_l_fast(l):
+def Y_l_fast(l: Any) -> Any:
     """
     Same as default real_sph_harm, except requiring cos(theta) as input instead of theta
     Which hopefully will increase efficiency

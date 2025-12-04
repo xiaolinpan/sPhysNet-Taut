@@ -1,3 +1,4 @@
+from typing import Any
 import glob
 import os
 import os.path as osp
@@ -20,7 +21,7 @@ logP_to_watOct = 2.302585093 * R * 298.15
 
 
 class AtomContribAnalyzer(TrainedFolder):
-    def __init__(self, folder_name, sdf_folder, task="water_sol"):
+    def __init__(self, folder_name: Any, sdf_folder: Any, task: Any="water_sol") -> None:
         super().__init__(folder_name)
 
         self.task = task
@@ -40,7 +41,7 @@ class AtomContribAnalyzer(TrainedFolder):
             self.sample_id_name = "sample_id"
             self.unit = "logP unit"
 
-    def run(self):
+    def run(self) -> Any:
         try:
             self._run_atom_contrib()
         except AssertionError as e:
@@ -48,7 +49,7 @@ class AtomContribAnalyzer(TrainedFolder):
         self._draw_atom_contrib("CalcSol(kcal/mol)", "CalcSol")
         self._draw_atom_contrib("CalcLogP", "CalcLogP")
 
-    def _draw_atom_contrib(self, activity_name, save_name):
+    def _draw_atom_contrib(self, activity_name: Any, save_name: Any) -> Any:
         import rdkit
         from rdkit.Chem.Draw import rdMolDraw2D, MolsToGridImage
         from rdkit.Chem.AllChem import RemoveAllHs, MolToPDBFile
@@ -113,7 +114,7 @@ class AtomContribAnalyzer(TrainedFolder):
         img = MolsToGridImage(mols, molsPerRow=5, subImgSize=(300, 300), legends=legends)
         img.save(osp.join(self.save_root, f"al(most)_tested_mols.{save_name}.png"))
 
-    def _run_atom_contrib(self):
+    def _run_atom_contrib(self) -> Any:
         ds_tqdm = tqdm.tqdm(self.dl_test)
         for batch in ds_tqdm:
             batch = batch.to(get_device())
@@ -151,25 +152,25 @@ class AtomContribAnalyzer(TrainedFolder):
 
             pred_info.to_csv(osp.join(mol_root, "pred_info.csv"), index=False)
 
-    def predict(self, batch):
+    def predict(self, batch: Any) -> Any:
         return self.model(batch)
 
     @property
-    def intersection_df(self):
+    def intersection_df(self) -> Any:
         if self._intersection_df is None:
             root = "/home/carrot_of_rivia/Documents/PycharmProjects/Mol3DGenerator/data/freesolv_openchem"
             self._intersection_df = pd.read_csv(osp.join(root, "intersection.csv")).set_index("sample_id_1")
         return self._intersection_df
 
     @property
-    def freesolv_ref_df(self):
+    def freesolv_ref_df(self) -> Any:
         if self._freesolv_ref_df is None:
             root = "/home/carrot_of_rivia/Documents/PycharmProjects/Mol3DGenerator/data/freesolv_sol"
             self._freesolv_ref_df = pd.read_csv(osp.join(root, "freesolv_paper_fl.csv")).set_index("sample_id")
         return self._freesolv_ref_df
 
     @property
-    def save_root(self):
+    def save_root(self) -> Any:
         if self._test_dir is None:
             test_prefix = self.args["folder_prefix"] + '_atom_contrib_'
             current_time = datetime.now().strftime("%Y-%m-%d_%H%M%S")
@@ -179,7 +180,7 @@ class AtomContribAnalyzer(TrainedFolder):
         return self._test_dir
 
     @property
-    def ds(self):
+    def ds(self) -> Any:
         if self._data_provider is None:
             _data_provider = ds_from_args(self.args_raw, rm_keys=False)
             setattr(_data_provider.data, "index_in_ds", torch.arange(len(_data_provider)))
@@ -189,14 +190,14 @@ class AtomContribAnalyzer(TrainedFolder):
         return self._data_provider
 
     @property
-    def dl_test(self):
+    def dl_test(self) -> Any:
         if self._dataloader_test is None:
             self._dataloader_test = DataLoader(self.ds_test, batch_size=1, collate_fn=collate_fn)
         return self._dataloader_test
 
 
 class AtomContribAnalyzerEns(AtomContribAnalyzer):
-    def __init__(self, folder_name, sdf_folder, task="water_sol", config_folder=None):
+    def __init__(self, folder_name: Any, sdf_folder: Any, task: Any="water_sol", config_folder: Any=None) -> None:
         super().__init__(folder_name, sdf_folder, task)
 
         self.config_folder = config_folder
@@ -206,14 +207,14 @@ class AtomContribAnalyzerEns(AtomContribAnalyzer):
         self._model_list = None
 
     @property
-    def model_list(self):
+    def model_list(self) -> Any:
         if self._model_list is None:
             tmp_folders = [TrainedFolder(f) for f in self.ens_folders]
             model_list = [f.model for f in tmp_folders]
             self._model_list = model_list
         return self._model_list
 
-    def predict(self, batch):
+    def predict(self, batch: Any) -> Any:
         model_out_list = None
         for model in self.model_list:
             model_out = model(batch)
@@ -228,7 +229,7 @@ class AtomContribAnalyzerEns(AtomContribAnalyzer):
         return ens_out
 
     @property
-    def args_raw(self):
+    def args_raw(self) -> Any:
         if self._args_raw is None:
             if self.config_folder is not None:
                 _args_raw, _config_name = read_folder_config(self.config_folder)
@@ -239,7 +240,7 @@ class AtomContribAnalyzerEns(AtomContribAnalyzer):
         return self._args_raw
 
     @property
-    def ds(self):
+    def ds(self) -> Any:
         if self._data_provider is None:
             _data_provider = ds_from_args(self.args_raw, rm_keys=False)
             setattr(_data_provider.data, "index_in_ds", torch.arange(len(_data_provider)))

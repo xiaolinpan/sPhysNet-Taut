@@ -1,3 +1,4 @@
+from typing import Any
 import time
 from treelib import Tree
 import torch
@@ -10,7 +11,7 @@ function_and_time = {}
 function_and_count = {}
 
 
-def record_data(name, t0, syn=False):
+def record_data(name: Any, t0: Any, syn: Any=False) -> Any:
     if torch.cuda.is_available() and syn:
         torch.cuda.synchronize()
     delta_t = time.time() - t0
@@ -23,7 +24,7 @@ def record_data(name, t0, syn=False):
     return time.time()
 
 
-def print_function_runtime(folder="."):
+def print_function_runtime(folder: Any=".") -> Any:
     for f_name, info_dict in zip(["meta_time.txt", "meta_count.txt"], [function_and_time, function_and_count]):
         tree = Tree()
         tree.create_node("ROOT", "root")

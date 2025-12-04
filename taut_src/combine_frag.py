@@ -1,7 +1,8 @@
+from typing import Any
 from rdkit import Chem
 from collections import namedtuple
 
-def get_linker_map_index(mol, smi, num):
+def get_linker_map_index(mol: Any, smi: Any, num: Any) -> Any:
     data = namedtuple("frag", "mol smi aidx_map_lidx")
     index_map = namedtuple("atom_idx_map_linker_idx", "atom_idx linker_idx")
     aidx_map_lidx, linker_idxs = [], []
@@ -12,14 +13,14 @@ def get_linker_map_index(mol, smi, num):
             linker_idxs.append(at.GetIdx()+num)
     return data(mol=mol, smi=smi, aidx_map_lidx=aidx_map_lidx), linker_idxs
 
-def combine_mols(mols):
+def combine_mols(mols: Any) -> Any:
     combo = Chem.CombineMols(mols[0], mols[1])
     if len(mols) >= 3:
         for mol in mols[2:]:
             combo = Chem.CombineMols(combo, mol)
     return combo
 
-def get_linker_info(smis):
+def get_linker_info(smis: Any) -> Any:
     index_map_info, mols, all_linker_idxs = [], [], []
     num = 0
     for smi in smis:
@@ -31,7 +32,7 @@ def get_linker_info(smis):
         all_linker_idxs.extend(linker_idxs)
     return index_map_info, mols, all_linker_idxs
 
-def get_link_atom(index_map_info, max_linker_idx):
+def get_link_atom(index_map_info: Any, max_linker_idx: Any) -> Any:
     link_atom_pair = {}
     for idx in range(1, max_linker_idx+1):
         link_atom_pair.update({idx:[]})
@@ -41,13 +42,13 @@ def get_link_atom(index_map_info, max_linker_idx):
             link_atom_pair[aidx_lidx.linker_idx].append(aidx_lidx.atom_idx)
     return link_atom_pair
 
-def remove_linker(emol, lidxs):
+def remove_linker(emol: Any, lidxs: Any) -> Any:
     slidxs = sorted(lidxs, reverse=True)
     for idx in slidxs:
         emol.RemoveAtom(idx)
     return emol
 
-def get_max_linker_idx(smis):
+def get_max_linker_idx(smis: Any) -> Any:
     linker_idxs = []
     for smi in smis:
         m = Chem.MolFromSmiles(smi)
@@ -56,7 +57,7 @@ def get_max_linker_idx(smis):
                 linker_idxs.append(at.GetAtomMapNum())
     return max(linker_idxs)
               
-def link_fragment(smis):
+def link_fragment(smis: Any) -> Any:
     index_map_info, mols, all_linker_idxs = get_linker_info(smis)
     max_linker_idx = get_max_linker_idx(smis)
     link_atom_pair = get_link_atom(index_map_info, max_linker_idx)

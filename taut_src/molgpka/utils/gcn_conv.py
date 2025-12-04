@@ -1,4 +1,6 @@
+from typing import Any, Optional, Tuple
 import torch
+from torch import Tensor
 from torch.nn import Parameter
 from torch_scatter import scatter_add
 from torch_geometric.nn.conv import MessagePassing
@@ -38,8 +40,8 @@ class GCNConv(MessagePassing):
             :class:`torch_geometric.nn.conv.MessagePassing`.
     """
 
-    def __init__(self, in_channels, out_channels, improved=False, cached=False,
-                 bias=True, **kwargs):
+    def __init__(self, in_channels: Any, out_channels: Any, improved: Any=False, cached: Any=False,
+                 bias: Any=True, **kwargs: Any) -> None:
         super(GCNConv, self).__init__(aggr='add', **kwargs)
 
         self.in_channels = in_channels
@@ -56,15 +58,15 @@ class GCNConv(MessagePassing):
 
         self.reset_parameters()
 
-    def reset_parameters(self):
+    def reset_parameters(self) -> None:
         glorot(self.weight)
         zeros(self.bias)
         self.cached_result = None
         self.cached_num_edges = None
 
     @staticmethod
-    def norm(edge_index, num_nodes, edge_weight=None, improved=False,
-             dtype=None):
+    def norm(edge_index: Tensor, num_nodes: int, edge_weight: Optional[Tensor]=None, improved: bool=False,
+             dtype: Optional[torch.dtype]=None) -> Tuple[Tensor, Tensor]:
         if edge_weight is None:
             edge_weight = torch.ones((edge_index.size(1), ), dtype=dtype,
                                      device=edge_index.device)
@@ -80,7 +82,7 @@ class GCNConv(MessagePassing):
 
         return edge_index, deg_inv_sqrt[row] * edge_weight * deg_inv_sqrt[col]
 
-    def forward(self, x, edge_index, edge_weight=None):
+    def forward(self, x: Tensor, edge_index: Tensor, edge_weight: Optional[Tensor]=None) -> Tensor:
         """"""
         x = torch.matmul(x, self.weight)
 
@@ -102,14 +104,14 @@ class GCNConv(MessagePassing):
 
         return self.propagate(edge_index, x=x, norm=norm)
 
-    def message(self, x_j, norm):
+    def message(self, x_j: Tensor, norm: Tensor) -> Tensor:
         return norm.view(-1, 1) * x_j
 
-    def update(self, aggr_out):
+    def update(self, aggr_out: Tensor) -> Tensor:
         if self.bias is not None:
             aggr_out = aggr_out + self.bias
         return aggr_out
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{}({}, {})'.format(self.__class__.__name__, self.in_channels,
                                    self.out_channels)

@@ -1,3 +1,4 @@
+from typing import Any
 import argparse
 import os
 import os.path as osp
@@ -26,14 +27,14 @@ PROCESSED_DATA_ROOT = osp.join(RAW_DATA_ROOT, "..", "processed")
 os.makedirs(TEMP_DATA_ROOT, exist_ok=True)
 os.makedirs(PROCESSED_DATA_ROOT, exist_ok=True)
 
-def get_debug_arg():
+def get_debug_arg() -> Any:
     parser = argparse.ArgumentParser()
     parser.add_argument("--debug", action="store_true")
     args = parser.parse_args()
     return args
 
 
-def frag20_csd20_sol_single(sample_id, csv, geometry, out_path, df=None):
+def frag20_csd20_sol_single(sample_id: Any, csv: Any, geometry: Any, out_path: Any, df: Any=None) -> Any:
     # t0 = time.time()
     if df is None:
         df = pd.read_csv(csv)
@@ -43,7 +44,7 @@ def frag20_csd20_sol_single(sample_id, csv, geometry, out_path, df=None):
     sdf2pyg_single(this_sdf, df, out_path)
 
 
-def sdf_from_sample_id(sample_id, geometry):
+def sdf_from_sample_id(sample_id: Any, geometry: Any) -> Any:
     source = sample_id.split("_")[0]
     idx = sample_id.split("_")[1]
 
@@ -68,7 +69,7 @@ def sdf_from_sample_id(sample_id, geometry):
     return this_sdf
 
 
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser()
     parser.add_argument("--sample_id", default="20_11110")
     parser.add_argument("--csv", default="20_11110.csv")

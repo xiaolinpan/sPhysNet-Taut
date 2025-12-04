@@ -1,3 +1,4 @@
+from typing import Any
 import logging
 import time
 from math import ceil
@@ -17,8 +18,8 @@ class OutputLayer(torch.nn.Module):
     The output layer(red one in paper) of PhysNet
     """
 
-    def __init__(self, F, n_output, n_res_output, activation, uncertainty_modify, n_read_out=0, batch_norm=False,
-                 dropout=False, zero_last_linear=True, bias=False):
+    def __init__(self, F: Any, n_output: Any, n_res_output: Any, activation: Any, uncertainty_modify: Any, n_read_out: Any=0, batch_norm: Any=False,
+                 dropout: Any=False, zero_last_linear: Any=True, bias: Any=False) -> None:
         self.batch_norm = batch_norm
         super().__init__()
         self.concrete_dropout = (uncertainty_modify.split('[')[0] == "concreteDropoutOutput")
@@ -70,7 +71,7 @@ class OutputLayer(torch.nn.Module):
 
         self.activation = activation_getter(activation)
 
-    def forward(self, x):
+    def forward(self, x: Any) -> Any:
         tmp_res = x
         regularization = 0.
 
@@ -98,7 +99,7 @@ class OutputLayer(torch.nn.Module):
             out = self.lin(out)
         return out, regularization, embed_b4_ss
 
-    def freeze_residual_layers(self):
+    def freeze_residual_layers(self) -> Any:
         for i in range(self.n_res_output):
             for param in getattr(self, f"res_layer{i}").parameters():
                 param.requires_grad_(False)
@@ -109,8 +110,8 @@ class PhysModule(torch.nn.Module):
     Main module in PhysNet
     """
 
-    def __init__(self, F, K, n_output, n_res_atomic, n_res_interaction, n_res_output, activation, uncertainty_modify,
-                 n_read_out, batch_norm, dropout, zero_last_linear, bias):
+    def __init__(self, F: Any, K: Any, n_output: Any, n_res_atomic: Any, n_res_interaction: Any, n_res_output: Any, activation: Any, uncertainty_modify: Any,
+                 n_read_out: Any, batch_norm: Any, dropout: Any, zero_last_linear: Any, bias: Any) -> None:
         super().__init__()
         self.interaction = InteractionModule(F=F, K=K, n_res_interaction=n_res_interaction, activation=activation,
                                              batch_norm=batch_norm, dropout=dropout).type(floating_type)
@@ -121,7 +122,7 @@ class PhysModule(torch.nn.Module):
                                   uncertainty_modify=uncertainty_modify, n_read_out=n_read_out, batch_norm=batch_norm,
                                   dropout=dropout, zero_last_linear=zero_last_linear, bias=bias)
 
-    def forward(self, input_dict):
+    def forward(self, input_dict: Any) -> Any:
         # t0 = time.time()
 
         x = input_dict["vi"]
@@ -146,7 +147,7 @@ class PhysModule(torch.nn.Module):
 
         return {"vi": tmp_res, "out": out_res, "regularization": regularization, "embed_b4_ss": embed_b4_ss}
 
-    def freeze_prev_layers(self):
+    def freeze_prev_layers(self) -> Any:
         for param in self.parameters():
             param.requires_grad_(False)
         for param in self.output.parameters():

@@ -1,3 +1,4 @@
+from typing import Any
 import argparse
 
 import pandas as pd
@@ -6,7 +7,7 @@ import torch
 from util_func.gauss.read_gauss_log import Gauss16Log
 
 
-def read_gauss_single():
+def read_gauss_single() -> Any:
     parser = argparse.ArgumentParser()
     parser.add_argument("--log", type=str)
     parser.add_argument("--log_sdf", type=str)

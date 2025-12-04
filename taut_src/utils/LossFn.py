@@ -1,3 +1,4 @@
+from typing import Any
 from copy import deepcopy
 from typing import Union, List
 
@@ -14,8 +15,8 @@ logP_to_watOct = 2.302585093 * R * 298.15
 
 
 class LossFn:
-    def __init__(self, w_e, w_f, w_q, w_p, action: Union[List[str], str] = "E", auto_sol=False, target_names=None,
-                 config_dict=None):
+    def __init__(self, w_e: Any, w_f: Any, w_q: Any, w_p: Any, action: Union[List[str], str] = "E", auto_sol: Any=False, target_names: Any=None,
+                 config_dict: Any=None) -> None:
         self.loss_metric = config_dict["loss_metric"].lower()
         self.z_loss_weight = config_dict["z_loss_weight"]
         # keep only solvation energy/logP, only used in transfer learning on exp datasets
@@ -50,7 +51,7 @@ class LossFn:
             self.soft_plus = torch.nn.Softplus()
         self.num_targets = len(self.target_names)
 
-    def __call__(self, model_output, data, is_training, loss_detail=False, diff_detail=False):
+    def __call__(self, model_output: Any, data: Any, is_training: Any, loss_detail: Any=False, diff_detail: Any=False) -> Any:
         if self.loss_metric == "ce":
             prop_tgt, prop_pred = self._get_target(model_output, data)
             assert prop_tgt.shape[-1] == 1, "Currently only support single task classification"
@@ -196,7 +197,7 @@ class LossFn:
         else:
             raise ValueError("Invalid action: {}".format(self.action))
 
-    def _get_target(self, model_output: dict, data):
+    def _get_target(self, model_output: dict, data: Any) -> Any:
         """
         Get energy target from data
         Solvation energy is in kcal/mol but gas/water/octanol energy is in eV
@@ -255,7 +256,7 @@ class LossFn:
         return prop_tgt, prop_pred
 
     @property
-    def target_name_to_id(self):
+    def target_name_to_id(self) -> Any:
         if self._target_name_to_id is None:
             temp = {}
             for name in self.target_names:

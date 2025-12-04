@@ -1,3 +1,4 @@
+from typing import Any
 import logging
 import math
 import time
@@ -35,48 +36,48 @@ class PhysDimeNet(nn.Module):
     """
 
     def __init__(self,
-                 n_atom_embedding,
-                 modules,
-                 bonding_type,
-                 n_feature,
-                 n_output,
-                 n_dime_before_residual,
-                 n_dime_after_residual,
-                 n_output_dense,
-                 n_phys_atomic_res,
-                 n_phys_interaction_res,
-                 n_phys_output_res,
-                 n_bi_linear,
-                 nh_lambda,
-                 normalize,
-                 shared_normalize_param,
-                 activations,
-                 restrain_non_bond_pred,
-                 expansion_fn,
-                 uncertainty_modify,
-                 coulomb_charge_correct,
-                 loss_metric,
-                 uni_task_ss,
-                 lin_last,
-                 last_lin_bias,
-                 train_shift,
-                 mask_z,
-                 time_debug,
-                 z_loss_weight,
-                 acsf=False,
-                 energy_shift=None,
-                 energy_scale=None,
-                 debug_mode=False,
-                 action="E",
-                 target_names=None,
-                 batch_norm=False,
-                 dropout=False,
-                 requires_atom_prop=False,
-                 requires_atom_embedding=False,
-                 pooling="sum",
-                 ext_atom_features=None,
-                 ext_atom_dim=0,
-                 **kwargs):
+                 n_atom_embedding: Any,
+                 modules: Any,
+                 bonding_type: Any,
+                 n_feature: Any,
+                 n_output: Any,
+                 n_dime_before_residual: Any,
+                 n_dime_after_residual: Any,
+                 n_output_dense: Any,
+                 n_phys_atomic_res: Any,
+                 n_phys_interaction_res: Any,
+                 n_phys_output_res: Any,
+                 n_bi_linear: Any,
+                 nh_lambda: Any,
+                 normalize: Any,
+                 shared_normalize_param: Any,
+                 activations: Any,
+                 restrain_non_bond_pred: Any,
+                 expansion_fn: Any,
+                 uncertainty_modify: Any,
+                 coulomb_charge_correct: Any,
+                 loss_metric: Any,
+                 uni_task_ss: Any,
+                 lin_last: Any,
+                 last_lin_bias: Any,
+                 train_shift: Any,
+                 mask_z: Any,
+                 time_debug: Any,
+                 z_loss_weight: Any,
+                 acsf: Any=False,
+                 energy_shift: Any=None,
+                 energy_scale: Any=None,
+                 debug_mode: Any=False,
+                 action: Any="E",
+                 target_names: Any=None,
+                 batch_norm: Any=False,
+                 dropout: Any=False,
+                 requires_atom_prop: Any=False,
+                 requires_atom_embedding: Any=False,
+                 pooling: Any="sum",
+                 ext_atom_features: Any=None,
+                 ext_atom_dim: Any=0,
+                 **kwargs: Any) -> None:
         """
         
         :param n_atom_embedding: number of atoms to embed, usually set to 95
@@ -350,7 +351,7 @@ class PhysDimeNet(nn.Module):
             assert self.requires_atom_embedding
             assert isinstance(self.main_module_list[-1], PhysModule)
 
-    def freeze_prev_layers(self, freeze_extra=False):
+    def freeze_prev_layers(self, freeze_extra: Any=False) -> Any:
         if freeze_extra:
             # Freeze scale, shift and Gaussian RBF parameters
             for param in self.parameters():
@@ -359,7 +360,7 @@ class PhysDimeNet(nn.Module):
             self.main_module_list[i].freeze_prev_layers()
             self.main_module_list[i].output.freeze_residual_layers()
 
-    def forward(self, data):
+    def forward(self, data: Any) -> Any:
         # torch.cuda.synchronize(device=device)
         t0 = time.time()
 

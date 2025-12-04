@@ -1,3 +1,4 @@
+from typing import Any
 import time
 
 import torch
@@ -12,8 +13,8 @@ from taut_src.utils.utils_functions import floating_type, get_n_params
 
 
 class DimeModule(nn.Module):
-    def __init__(self, dim_rbf, dim_sbf, dim_msg, n_output, n_res_interaction, n_res_msg, n_dense_output, dim_bi_linear,
-                 activation, uncertainty_modify):
+    def __init__(self, dim_rbf: Any, dim_sbf: Any, dim_msg: Any, n_output: Any, n_res_interaction: Any, n_res_msg: Any, n_dense_output: Any, dim_bi_linear: Any,
+                 activation: Any, uncertainty_modify: Any) -> None:
         super().__init__()
         self.uncertainty_modify = uncertainty_modify
         self.activation = activation_getter(activation)
@@ -36,7 +37,7 @@ class DimeModule(nn.Module):
         self.output_layer = OutputLayer(dim_msg, dim_rbf, n_output, n_dense_output, activation,
                                         concrete_dropout=(uncertainty_modify == 'concreteDropoutOutput'))
 
-    def forward(self, input_dict):
+    def forward(self, input_dict: Any) -> Any:
         msg_ji = input_dict["mji"]
         rbf_ji = input_dict["edge_attr"]["rbf_ji"]
         sbf_kji = input_dict["edge_attr"]["sbf_kji"]
@@ -74,7 +75,7 @@ class DimeModule(nn.Module):
         # t0 = record_data('main.out-layer', t0)
         return {"mji": mji, "out": out, "regularization": regularization}
 
-    def freeze_prev_layers(self):
+    def freeze_prev_layers(self) -> Any:
         for param in self.parameters():
             param.requires_grad_(False)
         for param in self.output_layer.parameters():

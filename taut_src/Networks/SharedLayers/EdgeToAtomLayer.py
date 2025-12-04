@@ -1,3 +1,4 @@
+from typing import Any
 import torch
 import torch.nn as nn
 
@@ -5,7 +6,7 @@ from torch_scatter import scatter
 
 
 class EdgeToAtomLayer(nn.Module):
-    def __init__(self, source_to_target=True):
+    def __init__(self, source_to_target: Any=True) -> None:
         """
 
         :param source_to_target: If true, assume edge_index[0, :] is the source and edge_index[1, :] is target
@@ -13,7 +14,7 @@ class EdgeToAtomLayer(nn.Module):
         super().__init__()
         self.source_to_target = source_to_target
 
-    def forward(self, input_dict):
+    def forward(self, input_dict: Any) -> Any:
         edge_attr = input_dict["mj"]
         edge_index = input_dict["edge_index"]
         if self.source_to_target:

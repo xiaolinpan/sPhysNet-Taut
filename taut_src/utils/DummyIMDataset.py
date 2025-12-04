@@ -1,3 +1,4 @@
+from typing import Any
 import logging
 import os.path as osp
 import warnings
@@ -15,8 +16,8 @@ hartree2ev = Hartree / eV
 
 
 class DummyIMDataset(InMemoryDataset):
-    def __init__(self, root, dataset_name, split=None, sub_ref=False, convert_unit=True, valid_size=1000, collate=False,
-                 **kwargs):
+    def __init__(self, root: Any, dataset_name: Any, split: Any=None, sub_ref: Any=False, convert_unit: Any=True, valid_size: Any=1000, collate: Any=False,
+                 **kwargs: Any) -> None:
         self.sub_ref = sub_ref
         self.dataset_name = dataset_name
         self.split = split
@@ -70,21 +71,21 @@ class DummyIMDataset(InMemoryDataset):
             preprocess_dataset(osp.join(osp.dirname(__file__), "GaussUtils"), self, convert_unit)
 
     @property
-    def raw_file_names(self):
+    def raw_file_names(self) -> Any:
         return ["dummy"]
 
     @property
-    def processed_file_names(self):
+    def processed_file_names(self) -> Any:
         return [self.dataset_name, self.split] if self.split is not None else [self.dataset_name]
 
-    def download(self):
+    def download(self) -> Any:
         pass
 
-    def process(self):
+    def process(self) -> Any:
         pass
 
 
-def subtract_ref(dataset, save_path, use_jianing_ref=True, data_root="./data", convert_unit=True):
+def subtract_ref(dataset: Any, save_path: Any, use_jianing_ref: Any=True, data_root: Any="./data", convert_unit: Any=True) -> Any:
     """
     Subtracting reference energy, the result is in eV unit
     :param convert_unit:  Convert gas from hartree to ev. Set to false if it is already in ev
@@ -119,7 +120,7 @@ def subtract_ref(dataset, save_path, use_jianing_ref=True, data_root="./data", c
         torch.save((dataset.data, dataset.slices), save_path)
 
 
-def preprocess_dataset(data_root, data_provider, convert_unit, logger=None):
+def preprocess_dataset(data_root: Any, data_provider: Any, convert_unit: Any, logger: Any=None) -> Any:
     # this "if" is because of my stupid decisions of subtracting reference beforehand in the "frag9to20_all" dataset
     # but later found it better to subtract it on the fly
     for name in ["gasEnergy", "watEnergy", "octEnergy"]:
@@ -131,7 +132,7 @@ def preprocess_dataset(data_root, data_provider, convert_unit, logger=None):
             break
 
 
-def concat_im_datasets(root: str, datasets: List[str], out_name: str):
+def concat_im_datasets(root: str, datasets: List[str], out_name: str) -> Any:
     data_list = []
     for dataset in datasets:
         dummy_dataset = DummyIMDataset(root, dataset)

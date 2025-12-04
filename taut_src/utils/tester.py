@@ -1,3 +1,4 @@
+from typing import Any
 import logging
 import logging
 import math
@@ -22,8 +23,8 @@ class Tester(TrainedFolder):
     Load a trained folder for performance evaluation
     """
 
-    def __init__(self, folder_name, n_forward=5, x_forward=False, use_exist=False, check_active=False,
-                 ignore_train=True, lightweight=True, config_folder=None, no_runtime_split=False):
+    def __init__(self, folder_name: Any, n_forward: Any=5, x_forward: Any=False, use_exist: Any=False, check_active: Any=False,
+                 ignore_train: Any=True, lightweight: Any=True, config_folder: Any=None, no_runtime_split: Any=False) -> None:
         super().__init__(folder_name, config_folder)
         self.lightweight = lightweight
         self.ignore_train = ignore_train
@@ -43,7 +44,7 @@ class Tester(TrainedFolder):
             os.mkdir(self._test_dir)
         return self._test_dir
 
-    def run_test(self):
+    def run_test(self) -> Any:
         # shutil.copyfile(os.path.join(folder_name, 'loss_data.pt'), os.path.join(test_dir, 'loss_data.pt'))
         shutil.copy(self.config_name, self.save_root)
 
@@ -105,7 +106,7 @@ class Tester(TrainedFolder):
         remove_handler()
 
 
-def print_uncertainty_figs(pred_std, diff, name, unit, test_dir, n_bins=10):
+def print_uncertainty_figs(pred_std: Any, diff: Any, name: Any, unit: Any, test_dir: Any, n_bins: Any=10) -> Any:
     import matplotlib.pyplot as plt
     # let x axis ordered ascending
     std_rank = torch.argsort(pred_std)
@@ -223,8 +224,8 @@ def print_uncertainty_figs(pred_std, diff, name, unit, test_dir, n_bins=10):
     return
 
 
-def test_info_analyze(pred, target, test_dir, logger=None, name='Energy', threshold_base=1.0, unit='kcal/mol',
-                      pred_std=None, x_forward=0):
+def test_info_analyze(pred: Any, target: Any, test_dir: Any, logger: Any=None, name: Any='Energy', threshold_base: Any=1.0, unit: Any='kcal/mol',
+                      pred_std: Any=None, x_forward: Any=0) -> Any:
     diff = pred - target
     rank = torch.argsort(diff.abs())
     diff_ranked = diff[rank]
@@ -263,9 +264,9 @@ def test_info_analyze(pred, target, test_dir, logger=None, name='Energy', thresh
     return
 
 
-def test_step(args, net, data_loader, total_size, loss_fn, mae_fn=torch.nn.L1Loss(reduction='mean'),
-              mse_fn=torch.nn.MSELoss(reduction='mean'), dataset_name='data', run_dir=None, lightweight=True,
-              n_forward=50, **kwargs):
+def test_step(args: Any, net: Any, data_loader: Any, total_size: Any, loss_fn: Any, mae_fn: Any=torch.nn.L1Loss(reduction='mean'),
+              mse_fn: Any=torch.nn.MSELoss(reduction='mean'), dataset_name: Any='data', run_dir: Any=None, lightweight: Any=True,
+              n_forward: Any=50, **kwargs: Any) -> Any:
     if args["uncertainty_modify"] == 'none':
         result = val_step_new(net, data_loader, loss_fn, diff=True, lightweight=lightweight)
         # we don't want to create folders here

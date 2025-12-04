@@ -1,3 +1,4 @@
+from typing import Any
 from taut_src.molgpka.predict_pka import predict
 from copy import deepcopy
 from rdkit import Chem
@@ -17,7 +18,24 @@ import random
 import os
 import copy
 
-def modify_mol(mol, acid_dict, base_dict):
+def to_canonical_smiles_if_valid(mol: Any) -> Any:
+    """
+    Convert a mol to a canonical SMILES, returning None if the structure
+    cannot be parsed back by RDKit. This guards downstream code from
+    calling MolToSmiles on None.
+    """
+    try:
+        smi = Chem.MolToSmiles(mol)
+        if not smi:
+            return None
+        rmol = Chem.MolFromSmiles(smi)
+        if rmol is None:
+            return None
+        return Chem.MolToSmiles(rmol)
+    except Exception:
+        return None
+
+def modify_mol(mol: Any, acid_dict: Any, base_dict: Any) -> Any:
     for at in mol.GetAtoms():
         idx = at.GetIdx()
         if idx in set(acid_dict.keys()):
@@ -34,7 +52,7 @@ def modify_mol(mol, acid_dict, base_dict):
     return mol
 
 
-def get_pKa_data(mol, ph, tph):
+def get_pKa_data(mol: Any, ph: Any, tph: Any) -> Any:
     stable_data, unstable_data = [], []
     for at in mol.GetAtoms():
         props = at.GetPropsAsDict()
@@ -56,7 +74,7 @@ def get_pKa_data(mol, ph, tph):
     return stable_data, unstable_data
 
 
-def get_neighbor_hydrogen(at):
+def get_neighbor_hydrogen(at: Any) -> Any:
     nats = at.GetNeighbors()
     h_nat_idxs = []
     for at in nats:
@@ -66,22 +84,28 @@ def get_neighbor_hydrogen(at):
     return h_nat_idxs
 
 
-def remove_atom(idx, mol):
+def remove_atom(idx: Any, mol: Any) -> Any:
     emol = Chem.EditableMol(mol)
     emol.RemoveAtom(idx)
     nmol = emol.GetMol()
     return nmol
 
 
-def modify_acid(at, mol):
+def modify_acid(at: Any, mol: Any) -> Any:
+    h_nat_idxs = get_neighbor_hydrogen(at)
+    if not h_nat_idxs:
+        return None
     at.SetFormalCharge(-1)
-    h_nat_idxs = get_neighbor_hydrogen( at )
     remove_h_idx = h_nat_idxs[0]
     nmol = remove_atom(remove_h_idx, mol)
+    try:
+        Chem.SanitizeMol(nmol)
+    except Exception:
+        return None
     return nmol
 
 
-def add_atom(at, mol):
+def add_atom(at: Any, mol: Any) -> Any:
     emol = Chem.EditableMol(mol)
     h_atom = Chem.Atom(1)
     h_idx = emol.AddAtom(h_atom)
@@ -91,43 +115,54 @@ def add_atom(at, mol):
     return new_mol
 
 
-def modify_base(at, mol):
+def modify_base(at: Any, mol: Any) -> Any:
     at.SetFormalCharge(1)
     new_mol = add_atom(at, mol)
     return new_mol
 
 
-def modify_stable_pka(new_mol, stable_data):
+def modify_stable_pka(new_mol: Any, stable_data: Any) -> Any:
     for pka_data in stable_data:
         idx, pka, acid_or_basic = pka_data
         at = new_mol.GetAtomWithIdx(idx)
         if acid_or_basic == "A":
-            new_mol = modify_acid(at, new_mol)
+            mod = modify_acid(at, new_mol)
+            if mod is None:
+                continue
+            new_mol = mod
         elif acid_or_basic == "B":
             new_mol = modify_base(at, new_mol)
     return new_mol
 
 
-def modify_unstable_pka(mol, unstable_data, i):
+def modify_unstable_pka(mol: Any, unstable_data: Any, i: Any) -> Any:
     combine_pka_datas = list(combinations(unstable_data, i))
     new_unsmis = []
     for pka_datas in combine_pka_datas:
         new_mol = deepcopy(mol)
         if len(pka_datas) == 0:
             continue
+        valid_combo = True
         for pka_data in pka_datas:
             idx, pka, acid_or_basic = pka_data
             at = new_mol.GetAtomWithIdx(idx)
             if acid_or_basic == "A":
-                new_mol = modify_acid(at, new_mol)
+                mod = modify_acid(at, new_mol)
+                if mod is None:
+                    valid_combo = False
+                    break
+                new_mol = mod
             elif acid_or_basic == "B":
                 new_mol = modify_base(at, new_mol)
-        smi = Chem.MolToSmiles(Chem.MolFromSmiles(Chem.MolToSmiles(new_mol)))
-        new_unsmis.append(smi)
+        if not valid_combo:
+            continue
+        smi = to_canonical_smiles_if_valid(new_mol)
+        if smi:
+            new_unsmis.append(smi)
     return new_unsmis
 
 
-def protonate_mol(smi, ph, tph):
+def protonate_mol(smi: Any, ph: Any, tph: Any) -> Any:
     omol = Chem.MolFromSmiles(smi)
     obase_dict, oacid_dict, omol = predict(omol)
     #print(oacid_dict)
@@ -139,17 +174,21 @@ def protonate_mol(smi, ph, tph):
     if n == 0:
         new_mol = deepcopy(mc)
         new_mol = modify_stable_pka(new_mol, stable_data)
-        smi = Chem.MolToSmiles(Chem.MolFromSmiles(Chem.MolToSmiles(new_mol)))
-        new_smis.append(smi)
+        smi = to_canonical_smiles_if_valid(new_mol)
+        if smi:
+            new_smis.append(smi)
     else:
         for i in range(n + 1):
             new_mol = deepcopy(mc)
-            modify_stable_pka(new_mol, stable_data)
+            new_mol = modify_stable_pka(new_mol, stable_data)
             if i == 0:
-                new_smis.append(Chem.MolToSmiles(Chem.MolFromSmiles(Chem.MolToSmiles(new_mol))))
+                smi = to_canonical_smiles_if_valid(new_mol)
+                if smi:
+                    new_smis.append(smi)
             new_unsmis = modify_unstable_pka(new_mol, unstable_data, i)
             new_smis.extend(new_unsmis)
-    return new_smis
+    # Deduplicate while preserving order
+    return list(dict.fromkeys(new_smis))
 
 
 if __name__=="__main__":
@@ -163,4 +202,3 @@ if __name__=="__main__":
 
 
    
-

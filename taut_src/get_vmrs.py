@@ -1,3 +1,4 @@
+from typing import Any
 from taut_src.molgpka.protonate import protonate_mol
 from rdkit import Chem
 from rdkit.Chem.MolStandardize import rdMolStandardize
@@ -6,7 +7,7 @@ from taut_src.cut_mol import get_frags
 from taut_src.tautomer import enumerate_tauts
 
 
-def is_ionic(m):
+def is_ionic(m: Any) -> Any:
     charges = []
     for at in m.GetAtoms():
         if at.GetFormalCharge() == 0:
@@ -16,14 +17,14 @@ def is_ionic(m):
     return any(charges)
 
 
-def uncharge_mol(mol):
+def uncharge_mol(mol: Any) -> Any:
     un = rdMolStandardize.Uncharger()
     mol = un.uncharge(mol)
     mol = Chem.MolFromSmiles(Chem.MolToSmiles(mol))
     return mol
 
 
-def get_tauts(m):
+def get_tauts(m: Any) -> Any:
     tauts = enumerate_tauts(m)
     ms = []
     for taut in tauts:
@@ -35,7 +36,7 @@ def get_tauts(m):
     return ms
 
 
-def unique_and_split(nms):
+def unique_and_split(nms: Any) -> Any:
     smis = [Chem.MolToSmiles(m) for m in nms]
     smis = list(set(smis))
     nmols, imols = [], []
@@ -48,18 +49,18 @@ def unique_and_split(nms):
     return nmols, imols
 
 
-def get_tauts_for_vmr(smi):
+def get_tauts_for_vmr(smi: Any) -> Any:
     vm = Chem.MolFromSmiles(smi)
     vtauts = get_tauts(vm)
     return vtauts
 
 
-def get_tauts_for_mol(m):
+def get_tauts_for_mol(m: Any) -> Any:
     mtauts = get_tauts(m)
     return mtauts
 
 
-def is_vmr(vmr_tauts, mol_tauts):
+def is_vmr(vmr_tauts: Any, mol_tauts: Any) -> Any:
     data = []
     for vm in vmr_tauts:
         labels = []
@@ -75,7 +76,7 @@ def is_vmr(vmr_tauts, mol_tauts):
     return all(data)
 
 
-def filter_vmrs(smallest_vmrs, mol_tauts):
+def filter_vmrs(smallest_vmrs: Any, mol_tauts: Any) -> Any:
     """
     mol_tauts: tautomers of a molecule
     """
@@ -88,7 +89,7 @@ def filter_vmrs(smallest_vmrs, mol_tauts):
             final_smallest_vmrs.append(vmr)
     return final_smallest_vmrs
 
-def filter_tauts_of_vmr(vmr_tauts, mol_tauts):
+def filter_tauts_of_vmr(vmr_tauts: Any, mol_tauts: Any) -> Any:
     vmr_tauts_filter = []
     for vm in vmr_tauts:
         labels = []
@@ -103,7 +104,7 @@ def filter_tauts_of_vmr(vmr_tauts, mol_tauts):
     return vmr_tauts_filter
 
 
-def enumerate_vmrs(smi):
+def enumerate_vmrs(smi: Any) -> Any:
     data = namedtuple('vmrs',
                       'smi tauts')
 

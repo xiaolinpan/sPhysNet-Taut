@@ -1,8 +1,9 @@
+from typing import Any
 from rdkit import Chem
 import copy
 
 
-def match_bonds(mm):
+def match_bonds(mm: Any) -> Any:
     tsmarts = ["[#6+0;!$(*=,#[!#6])]!@!=!#[!#0;!#1;!X1;!$([NH,NH2,OH,SH]-[*;r]);!$(*=,#[*;!R])]"]
     tpatterns = [Chem.MolFromSmarts(tsm) for tsm in tsmarts]
     matches = []
@@ -12,7 +13,7 @@ def match_bonds(mm):
     return matches
 
 
-def match_atoms(mm):
+def match_atoms(mm: Any) -> Any:
     fsmarts = ["[$([#6]([F,Cl])-[*;r])]"]
     fpatterns = [Chem.MolFromSmarts(fsm) for fsm in fsmarts]
     fatom_idxs = []
@@ -23,7 +24,7 @@ def match_atoms(mm):
     return fatom_idxs
 
 
-def get_bond_idxs(mm):
+def get_bond_idxs(mm: Any) -> Any:
     bonds_idxs = match_bonds(mm)
     atom_idxs = match_atoms(mm)
     
@@ -37,7 +38,7 @@ def get_bond_idxs(mm):
     return filter_bond_idxs
 
 
-def get_bonds(mol):
+def get_bonds(mol: Any) -> Any:
     bond_matches = get_bond_idxs(mol)
 
     bonds = []
@@ -46,7 +47,7 @@ def get_bonds(mol):
         bonds.append(bond.GetIdx())
     return bonds
 
-def get_frags(mol):
+def get_frags(mol: Any) -> Any:
     bonds = get_bonds(mol)
     if len(bonds) == 0:
         return []

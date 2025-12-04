@@ -1,3 +1,4 @@
+from typing import Any
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit import RDLogger
@@ -10,12 +11,12 @@ from taut_src.molgpka.utils.ionization_group import get_ionization_aid
 import torch
 from torch_geometric.data import Data
 
-def one_hot(x, allowable_set):
+def one_hot(x: Any, allowable_set: Any) -> Any:
     if x not in allowable_set:
         x = allowable_set[-1]
     return list(map(lambda s: x == s, allowable_set))
 
-def get_bond_pair(mol):
+def get_bond_pair(mol: Any) -> Any:
     bonds = mol.GetBonds()
     res = [[],[]]
     for bond in bonds:
@@ -23,7 +24,7 @@ def get_bond_pair(mol):
         res[1] += [bond.GetEndAtomIdx(), bond.GetBeginAtomIdx()]
     return res
 
-def get_atom_features(mol, aid):
+def get_atom_features(mol: Any, aid: Any) -> Any:
     AllChem.ComputeGasteigerCharges(mol)
     Chem.AssignStereochemistry(mol)
 
@@ -90,7 +91,7 @@ def get_atom_features(mol, aid):
         m.append(o)
     return m
 
-def mol2vec(mol, atom_idx, evaluation=True, pka=None):
+def mol2vec(mol: Any, atom_idx: Any, evaluation: Any=True, pka: Any=None) -> Any:
     node_f = get_atom_features(mol, atom_idx)
     edge_index = get_bond_pair(mol)
     if evaluation:

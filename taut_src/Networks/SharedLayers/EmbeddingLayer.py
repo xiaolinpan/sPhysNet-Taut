@@ -1,3 +1,4 @@
+from typing import Any
 import time
 
 import torch
@@ -10,13 +11,13 @@ from taut_src.utils.utils_functions import get_n_params
 
 
 class EmbeddingLayer(nn.Module):
-    def __init__(self, num_embeddings, embedding_dim):
+    def __init__(self, num_embeddings: Any, embedding_dim: Any) -> None:
         super().__init__()
 
         self.embedding = nn.Embedding(num_embeddings, embedding_dim)
         self.embedding.weight.data.uniform_(-1.732, 1.732)
 
-    def forward(self, Z):
+    def forward(self, Z: Any) -> Any:
         """
 
         :param Z:

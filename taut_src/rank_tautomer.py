@@ -1,3 +1,4 @@
+from typing import Any
 import os
 
 import numpy as np
@@ -18,14 +19,14 @@ warnings.filterwarnings("ignore")
 models  = load_models(model_paths)
 
 
-def get_device():
+def get_device() -> Any:
     if torch.cuda.is_available():
         return torch.device("cuda")
     else:
         return torch.device("cpu")
 
 
-def linker_to_carbon(smi):
+def linker_to_carbon(smi: Any) -> Any:
     mol = Chem.MolFromSmiles(smi)
 
     linker_aids = []
@@ -42,7 +43,7 @@ def linker_to_carbon(smi):
     return smi
 
 
-def predict_ensemble(models, data1, data2):
+def predict_ensemble(models: Any, data1: Any, data2: Any) -> Any:
     data1 = data1.to( get_device() )
     data2 = data2.to( get_device() )
     preds = []
@@ -52,7 +53,7 @@ def predict_ensemble(models, data1, data2):
     return np.mean(preds)
 
 
-def predict_by_smis(smis, num_confs):
+def predict_by_smis(smis: Any, num_confs: Any) -> Any:
     datas = []
     for idx, smi in enumerate(smis):
         data = calc_data_for_predict(smi, num_confs=num_confs)
@@ -69,7 +70,7 @@ def predict_by_smis(smis, num_confs):
     return output
 
 
-def calc_scores(tauts, num_confs, is_fragment):
+def calc_scores(tauts: Any, num_confs: Any, is_fragment: Any) -> Any:
     if is_fragment:
         tauts_smis_include_linker = [Chem.MolToSmiles(taut.mol) for taut in tauts]
         tauts_smis_exclude_linker = [linker_to_carbon(smi) for smi in tauts_smis_include_linker]
@@ -93,7 +94,7 @@ def calc_scores(tauts, num_confs, is_fragment):
     return df
 
 
-def rank_tauts(tauts, num_confs, is_fragment=True):
+def rank_tauts(tauts: Any, num_confs: Any, is_fragment: Any=True) -> Any:
     df = calc_scores(tauts, num_confs, is_fragment)
     smirks_rules = [taut.smirks for taut in tauts]
     df["smirks"] = smirks_rules

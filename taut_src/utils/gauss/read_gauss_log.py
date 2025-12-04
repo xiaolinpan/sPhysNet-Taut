@@ -1,3 +1,4 @@
+from typing import Any
 import argparse
 import copy
 import glob
@@ -12,7 +13,7 @@ from rdkit.Chem import SDMolSupplier, MolToSmiles, MolFromMolFile
 from tqdm import tqdm
 
 
-def read_log(software):
+def read_log(software: Any) -> Any:
     from util_func.orca.read_orca_log import OrcaLog
     LogClass = Gauss16Log if software == "gauss" else OrcaLog
     parser = argparse.ArgumentParser()
@@ -54,7 +55,7 @@ def read_log(software):
 
 
 class Gauss16Log:
-    def __init__(self, log_path, log_sdf, gauss_version: int = 16, supress_warning=False):
+    def __init__(self, log_path: Any, log_sdf: Any, gauss_version: int = 16, supress_warning: Any=False) -> None:
         """
         Extract information from Gaussian 16 log files OR from SDF files. In the later case, qm_sdf, dipole and
         prop_dict_raw must not be None
@@ -92,7 +93,7 @@ class Gauss16Log:
         # os.system("obabel -ig16 {} -osdf -O {}".format(log_path, qm_sdf))
 
     @property
-    def prop_dict(self):
+    def prop_dict(self) -> Any:
         """
         Migrated from Jianing's Frag20_prepare:
         https://github.com/jenniening/Frag20_prepare/blob/master/DataGen/prepare_data.py
@@ -129,23 +130,23 @@ class Gauss16Log:
                 self._prop_dict_raw["smiles"] = MolToSmiles(self.mol, allHsExplicit=False)
         return self._prop_dict_raw
 
-    def get_listeners(self):
+    def get_listeners(self) -> Any:
         return Gauss16LogListeners.get_all_listeners()
 
     @property
-    def reference_u0(self):
+    def reference_u0(self) -> Any:
         if self._reference_u0 is None:
             self._reference_u0 = np.sum([self._reference[i][1] for i in self.elements])
         return self._reference_u0
 
     @property
-    def log_lines(self):
+    def log_lines(self) -> Any:
         if self._log_lines is None:
             self._log_lines = open(self.log_path).readlines()
         return self._log_lines
 
     @property
-    def log_lines_rev(self):
+    def log_lines_rev(self) -> Any:
         if self._log_lines_rev is None:
             tmp = deepcopy(self.log_lines)
             tmp.reverse()
@@ -153,19 +154,19 @@ class Gauss16Log:
         return self._log_lines_rev
 
     @property
-    def mol(self):
+    def mol(self) -> Any:
         if self._mol is None:
             self._mol = MolFromMolFile(self.log_sdf, removeHs=False, strictParsing=False)
         return self._mol
 
     @property
-    def n_atoms(self):
+    def n_atoms(self) -> Any:
         if self._n_atoms is None:
             self._n_atoms = self.mol.GetNumAtoms()
         return self._n_atoms
 
     @property
-    def elements(self):
+    def elements(self) -> Any:
         if self._elements is None:
             self._elements = []
             for atom in self.mol.GetAtoms():
@@ -173,13 +174,13 @@ class Gauss16Log:
         return self._elements
 
     @property
-    def coordinates(self):
+    def coordinates(self) -> Any:
         if self._coordinates is None:
             self._coordinates = self.mol.GetConformer().GetPositions()
         return self._coordinates
 
     @property
-    def normal_termination(self):
+    def normal_termination(self) -> Any:
         if self._normal_termination is None:
             if self.log_path is None:
                 self._normal_termination = False
@@ -193,7 +194,7 @@ class Gauss16Log:
         return self._normal_termination
 
     @property
-    def charges_mulliken(self):
+    def charges_mulliken(self) -> Any:
         """ Get Mulliken charges """
         if self._charges_mulliken is None:
             for i, line in enumerate(self.log_lines_rev):
@@ -209,7 +210,7 @@ class Gauss16Log:
         return self._charges_mulliken
 
     @property
-    def dipole(self):
+    def dipole(self) -> Any:
         """ Calculate dipole using coordinates and charge for each atom """
         if self._dipole is None:
             if self.charges_mulliken is None:
@@ -240,7 +241,7 @@ class Gauss16Log:
             error_lines[f"error_line_-{i}"] = [self.log_lines[-i]]
         return pd.DataFrame(error_lines)
 
-    def get_torch_data(self, add_edge=False):
+    def get_torch_data(self, add_edge: Any=False) -> Any:
         from torch_geometric.data import Data
 
         try:
@@ -261,13 +262,13 @@ class Gauss16Log:
             this_data = None
         return this_data
 
-    def get_basic_dict(self):
+    def get_basic_dict(self) -> Any:
         return {"R": torch.as_tensor(self.coordinates).view(-1, 3),
                 "Z": torch.as_tensor(self.elements).view(-1),
                 "N": torch.as_tensor(self.n_atoms).view(-1)}
 
     @staticmethod
-    def add_item(info_dict, key, result_dict):
+    def add_item(info_dict: Any, key: Any, result_dict: Any) -> Any:
         data = info_dict[key]
         if isinstance(data, str):
             result_dict[key] = data
@@ -279,20 +280,20 @@ class Gauss16Log:
             result_dict[key] = data
 
     @staticmethod
-    def conv_type(info_dict):
+    def conv_type(info_dict: Any) -> Any:
         for key in info_dict:
             Gauss16Log.add_item(info_dict, key, info_dict)
 
 
 class Gauss16LogListeners:
     @staticmethod
-    def get_all_listeners():
+    def get_all_listeners() -> Any:
         ins = Gauss16LogListeners()
         return [ins.rotation_consts, ins.dipole_moments, ins.iso_polar, ins.alpha_eig, ins.r2, ins.zpve, ins.U0, ins.U,
                 ins.H, ins.G, ins.Cv, ins.E, ins.wall_time]
 
     @staticmethod
-    def rotation_consts(i, line, lines, out_dict, **kwargs):
+    def rotation_consts(i: Any, line: Any, lines: Any, out_dict: Any, **kwargs: Any) -> Any:
         if line.startswith(' Rotational constants'):
             vals = line.split()
             out_dict['A'] = float(vals[-3])
@@ -302,21 +303,21 @@ class Gauss16LogListeners:
         return False
 
     @staticmethod
-    def dipole_moments(i, line, lines, out_dict, **kwargs):
+    def dipole_moments(i: Any, line: Any, lines: Any, out_dict: Any, **kwargs: Any) -> Any:
         if line.startswith(' Dipole moment'):
             out_dict['mu'] = float(lines[i - 1].split()[-1])
             return True
         return False
 
     @staticmethod
-    def iso_polar(i, line, lines, out_dict, **kwargs):
+    def iso_polar(i: Any, line: Any, lines: Any, out_dict: Any, **kwargs: Any) -> Any:
         if line.startswith(' Isotropic polarizability'):
             out_dict['alpha'] = float(line.split()[-2])
             return True
         return False
 
     @staticmethod
-    def alpha_eig(i, line, lines, out_dict, **kwargs):
+    def alpha_eig(i: Any, line: Any, lines: Any, out_dict: Any, **kwargs: Any) -> Any:
         if line.startswith(' Alpha  occ. eigenvalues') and lines[i - 1].startswith(' Alpha virt. eigenvalues'):
             out_dict['ehomo(eV)'] = float(lines[i - 1].split()[4]) * kwargs["hartree2ev"]
             out_dict['elumo(eV)'] = float(line.split()[-1]) * kwargs["hartree2ev"]
@@ -325,63 +326,63 @@ class Gauss16LogListeners:
         return False
 
     @staticmethod
-    def r2(i, line, lines, out_dict, **kwargs):
+    def r2(i: Any, line: Any, lines: Any, out_dict: Any, **kwargs: Any) -> Any:
         if line.startswith(' Electronic spatial extent'):
             out_dict['R2'] = float(line.split()[-1])
             return True
         return False
 
     @staticmethod
-    def zpve(i, line, lines, out_dict, **kwargs):
+    def zpve(i: Any, line: Any, lines: Any, out_dict: Any, **kwargs: Any) -> Any:
         if line.startswith(' Zero-point correction'):
             out_dict['zpve(eV)'] = float(line.split()[-2]) * kwargs["hartree2ev"]
             return True
         return False
 
     @staticmethod
-    def U0(i, line, lines, out_dict, **kwargs):
+    def U0(i: Any, line: Any, lines: Any, out_dict: Any, **kwargs: Any) -> Any:
         if line.startswith(' Sum of electronic and zero-point Energies'):
             out_dict['U0(eV)'] = float(line.split()[-1]) * kwargs["hartree2ev"]
             return True
         return False
 
     @staticmethod
-    def U(i, line, lines, out_dict, **kwargs):
+    def U(i: Any, line: Any, lines: Any, out_dict: Any, **kwargs: Any) -> Any:
         if line.startswith(' Sum of electronic and thermal Energies'):
             out_dict['U(eV)'] = float(line.split()[-1]) * kwargs["hartree2ev"]
             return True
         return False
 
     @staticmethod
-    def H(i, line, lines, out_dict, **kwargs):
+    def H(i: Any, line: Any, lines: Any, out_dict: Any, **kwargs: Any) -> Any:
         if line.startswith(' Sum of electronic and thermal Enthalpies'):
             out_dict['H(eV)'] = float(line.split()[-1]) * kwargs["hartree2ev"]
             return True
         return False
 
     @staticmethod
-    def G(i, line, lines, out_dict, **kwargs):
+    def G(i: Any, line: Any, lines: Any, out_dict: Any, **kwargs: Any) -> Any:
         if line.startswith(' Sum of electronic and thermal Free Energies'):
             out_dict['G(eV)'] = float(line.split()[-1]) * kwargs["hartree2ev"]
             return True
         return False
 
     @staticmethod
-    def Cv(i, line, lines, out_dict, **kwargs):
+    def Cv(i: Any, line: Any, lines: Any, out_dict: Any, **kwargs: Any) -> Any:
         if line.startswith(' Total       '):
             out_dict['Cv'] = float(line.split()[-2])
             return True
         return False
 
     @staticmethod
-    def E(i, line, lines, out_dict, **kwargs):
+    def E(i: Any, line: Any, lines: Any, out_dict: Any, **kwargs: Any) -> Any:
         if line.startswith(' SCF Done'):
             out_dict['E(eV)'] = float(line.split()[4]) * kwargs["hartree2ev"]
             return True
         return False
 
     @staticmethod
-    def wall_time(i, line, lines, out_dict, **kwargs):
+    def wall_time(i: Any, line: Any, lines: Any, out_dict: Any, **kwargs: Any) -> Any:
         if line.startswith(" Elapsed time:       "):
             split = line.split()
             days = float(split[2])

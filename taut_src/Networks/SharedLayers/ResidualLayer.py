@@ -1,3 +1,4 @@
+from typing import Any
 import torch.nn as nn
 
 from taut_src.Networks.SharedLayers.ActivationFns import activation_getter
@@ -9,7 +10,7 @@ class ResidualLayer(nn.Module):
     """
     The residual layer defined in PhysNet
     """
-    def __init__(self, F, activation, concrete_dropout=False, batch_norm=False, dropout=False):
+    def __init__(self, F: Any, activation: Any, concrete_dropout: Any=False, batch_norm: Any=False, dropout: Any=False) -> None:
         super().__init__()
         self.batch_norm = batch_norm
         self.concrete_dropout = concrete_dropout
@@ -31,7 +32,7 @@ class ResidualLayer(nn.Module):
             self.lin1 = ConcreteDropout(self.lin1, module_type='Linear')
             self.lin2 = ConcreteDropout(self.lin2, module_type='Linear')
 
-    def forward(self, x):
+    def forward(self, x: Any) -> Any:
         regularization = 0.
         x_res = x
 

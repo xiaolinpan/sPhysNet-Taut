@@ -1,3 +1,4 @@
+from typing import Any
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -12,8 +13,8 @@ class ConcreteDropout(nn.Module):
     Adapted from https://github.com/yaringal/ConcreteDropout/blob/master/concrete-dropout-pytorch.ipynb
     Minor tweaks to be compatible with graph input
     """
-    def __init__(self, module, weight_regularizer=1e-6, module_type='Linear',
-                 dropout_regularizer=1e-5, init_min=0.1, init_max=0.1, train_p=True, normal_dropout=False):
+    def __init__(self, module: Any, weight_regularizer: Any=1e-6, module_type: Any='Linear',
+                 dropout_regularizer: Any=1e-5, init_min: Any=0.1, init_max: Any=0.1, train_p: Any=True, normal_dropout: Any=False) -> None:
         """
         :param module:
         :param weight_regularizer:
@@ -38,10 +39,10 @@ class ConcreteDropout(nn.Module):
 
         self.p_logit = nn.Parameter(torch.empty(1).uniform_(init_min, init_max), requires_grad=train_p)
 
-    def freeze_prev_layers(self):
+    def freeze_prev_layers(self) -> Any:
         self.module.freeze_prev_layers()
 
-    def forward(self, *inputs):
+    def forward(self, *inputs: Any) -> Any:
         """
 
         :param inputs: has different property depending on PhysNet or DimeNet input.
@@ -77,7 +78,7 @@ class ConcreteDropout(nn.Module):
         else:
             return module_out[0], module_out[1], regularization
 
-    def _concrete_dropout(self, inputs, p):
+    def _concrete_dropout(self, inputs: Any, p: Any) -> Any:
         """
         Dropout only apply to representation
         :param inputs:
@@ -112,7 +113,7 @@ class ConcreteDropout(nn.Module):
 
         return modified_input
 
-    def _normal_dropout(self, inputs):
+    def _normal_dropout(self, inputs: Any) -> Any:
         if self.module_type == 'PhysNet':
             modified_input = (self.dropout(inputs[0]), inputs[1], inputs[2])
         elif self.module_type == 'DimeNet':

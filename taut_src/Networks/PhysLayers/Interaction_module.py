@@ -1,3 +1,4 @@
+from typing import Any, Tuple, Union
 import torch
 import torch.nn as nn
 import torch.nn.functional
@@ -15,7 +16,7 @@ class InteractionModule(nn.Module):
     The interaction layer defined in PhysNet
     """
 
-    def __init__(self, F, K, n_res_interaction, activation, batch_norm, dropout):
+    def __init__(self, F: Any, K: Any, n_res_interaction: Any, activation: Any, batch_norm: Any, dropout: Any) -> None:
         super().__init__()
         u = torch.Tensor(1, F).type(floating_type).fill_(1.)
         self.register_parameter('u', torch.nn.Parameter(u, True))
@@ -37,7 +38,7 @@ class InteractionModule(nn.Module):
 
         self.activation = activation_getter(activation)
 
-    def forward(self, x, edge_index, edge_attr):
+    def forward(self, x: Tensor, edge_index: Union[Tensor, SparseTensor], edge_attr: Tensor) -> Tuple[Tensor, Tensor]:
         msged_x = self.message_pass_layer(x, edge_index, edge_attr)
         tmp_res = msged_x
         for i in range(self.n_res_interaction):
@@ -55,7 +56,7 @@ class MessagePassingLayer(torch_geometric.nn.MessagePassing):
     see: https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html for more details
     """
 
-    def __init__(self, F, K, activation, aggr, batch_norm, dropout):
+    def __init__(self, F: Any, K: Any, activation: Any, aggr: Any, batch_norm: Any, dropout: Any) -> None:
         self.batch_norm = batch_norm
         flow = 'source_to_target'
         super().__init__(aggr=aggr, flow=flow)
@@ -76,7 +77,7 @@ class MessagePassingLayer(torch_geometric.nn.MessagePassing):
 
         self.activation = activation_getter(activation)
 
-    def message(self, x_j, edge_attr):
+    def message(self, x_j: Tensor, edge_attr: Tensor) -> Tensor:
         if self.batch_norm:
             x_j = self.bn_diff(x_j)
         msg = self.lin_for_diff(x_j)
@@ -85,11 +86,11 @@ class MessagePassingLayer(torch_geometric.nn.MessagePassing):
         msg = torch.mul(msg, masked_edge_attr)
         return msg
 
-    def forward(self, x, edge_index, edge_attr):
+    def forward(self, x: Tensor, edge_index: Union[Tensor, SparseTensor], edge_attr: Tensor) -> Tensor:
         x = self.activation(x)
         return self.propagate(edge_index, x=x, edge_attr=edge_attr)
 
-    def update(self, aggr_out, x):
+    def update(self, aggr_out: Tensor, x: Tensor) -> Tensor:
         if self.batch_norm:
             x = self.bn_same(x)
         a = self.activation(self.lin_for_same(x))

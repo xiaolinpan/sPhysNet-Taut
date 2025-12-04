@@ -1,3 +1,4 @@
+from typing import Any
 import argparse
 import os
 import os.path as osp
@@ -15,7 +16,7 @@ from utils.DataPrepareUtils import my_pre_transform, set_force_cpu
 hartree2ev = Hartree / eV
 
 
-def sdf2pyg_single(this_sdf, df, out_path):
+def sdf2pyg_single(this_sdf: Any, df: Any, out_path: Any) -> Any:
     # t0 = time.time()
 
     sdf_info = gauss.read_gauss_log.Gauss16Log(log_path=None, log_sdf=this_sdf, supress_warning=True)
@@ -64,7 +65,7 @@ def sdf2pyg_single(this_sdf, df, out_path):
     # t0 = time.time()
 
 
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser()
     parser.add_argument("--this_sdf")
     parser.add_argument("--out_path")

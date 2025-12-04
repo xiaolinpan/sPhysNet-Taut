@@ -1,6 +1,9 @@
+from typing import Any, Tuple, Union
 import torch
 import torch.nn as nn
+from torch import Tensor
 from torch_geometric.nn import MessagePassing
+from torch_sparse import SparseTensor
 from torch_scatter import scatter
 
 from taut_src.Networks.SharedLayers.ActivationFns import activation_getter
@@ -12,16 +15,16 @@ class _MPNScatter(MessagePassing):
     """
     Message passing layer exclusively used for scatter_
     """
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
-    def forward(self, x, edge_index, edge_attr):
+    def forward(self, x: Tensor, edge_index: Union[Tensor, SparseTensor], edge_attr: Tensor) -> Tensor:
         return self.propagate(edge_index, x=x, edge_attr=edge_attr)
 
-    def message(self, x_j, edge_attr):
+    def message(self, x_j: Tensor, edge_attr: Tensor) -> Tensor:
         return edge_attr
 
-    def update(self, aggr_out, x):
+    def update(self, aggr_out: Tensor, x: Tensor) -> Tensor:
         return aggr_out + x
 
 
@@ -29,7 +32,7 @@ class OutputLayer(torch.nn.Module):
     """
     The output layer(red one in paper) of DimeNet
     """
-    def __init__(self, embedding_dim, rbf_dim, n_output, n_dense, activation, concrete_dropout):
+    def __init__(self, embedding_dim: Any, rbf_dim: Any, n_output: Any, n_dense: Any, activation: Any, concrete_dropout: Any) -> None:
         super().__init__()
         self.concrete_dropout = concrete_dropout
         self.embedding_dim = embedding_dim
@@ -52,7 +55,7 @@ class OutputLayer(torch.nn.Module):
         if self.concrete_dropout:
             self.out_dense = ConcreteDropout(self.out_dense, module_type='Linear')
 
-    def forward(self, m_ji, rbf_ji, atom_edge_index):
+    def forward(self, m_ji: Tensor, rbf_ji: Tensor, atom_edge_index: Tensor) -> Tuple[Tensor, Union[Tensor, float]]:
         regularization = 0.
         # t0 = time.time()
 

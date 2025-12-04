@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from typing import Any
 import numpy as np
 import torch
 import torch_geometric
@@ -14,7 +15,7 @@ from taut_src.gen_confs import get_low_energy_conf
 _force_cpu = False
 
 
-def get_coords(mol):
+def get_coords(mol: Any) -> Any:
     conf = mol.GetConformer()
     coords = []
 
@@ -24,21 +25,21 @@ def get_coords(mol):
     return np.array(coords)
 
 
-def get_elements(mol):
+def get_elements(mol: Any) -> Any:
     z = []
     for atom in mol.GetAtoms():
         z.append(atom.GetAtomicNum())
     return np.array(z)
 
 
-def get_device():
+def get_device() -> Any:
     if torch.cuda.is_available():
         return torch.device("cuda")
     else:
         return torch.device("cpu")
 
 
-def _get_index_from_matrix(num, previous_num):
+def _get_index_from_matrix(num: Any, previous_num: Any) -> Any:
     """
     get the fully-connect graph edge index compatible with torch_geometric message passing module
     eg: when num = 3, will return:
@@ -55,7 +56,7 @@ def _get_index_from_matrix(num, previous_num):
     return index[:, mask] + previous_num
 
 
-def cal_edge(R, N, prev_N, edge_index, cal_coulomb=True, short_range=True):
+def cal_edge(R: Any, N: Any, prev_N: Any, edge_index: Any, cal_coulomb: Any=True, short_range: Any=True) -> Any:
     """
     calculate edge distance from edge_index;
     if cal_coulomb is True, additional edge will be calculated without any restriction
@@ -95,7 +96,7 @@ def cal_edge(R, N, prev_N, edge_index, cal_coulomb=True, short_range=True):
     return coulomb_dist, coulomb_index, short_range_dist, short_range_index
 
 
-def scale_R(R):
+def scale_R(R: Any) -> Any:
     abs_min = torch.abs(R).min()
     while abs_min < 1e-3:
         R = R - 1
@@ -103,7 +104,7 @@ def scale_R(R):
     return R
 
 
-def cal_msg_edge_index(edge_index):
+def cal_msg_edge_index(edge_index: Any) -> Any:
     msg_id_1 = torch.arange(edge_index.shape[-1]).repeat(edge_index.shape[-1], 1)
     msg_id_0 = msg_id_1.t()
     source_atom = edge_index[0, :].repeat(edge_index.shape[-1], 1)
@@ -113,7 +114,7 @@ def cal_msg_edge_index(edge_index):
     return result
 
 
-def voronoi_edge_index(R, boundary_factor, use_center):
+def voronoi_edge_index(R: Any, boundary_factor: Any, use_center: Any) -> Any:
     """
     Calculate Voronoi Diagram
     :param R: shape[-1, 3], the location of input points
@@ -148,7 +149,7 @@ def voronoi_edge_index(R, boundary_factor, use_center):
     edge_index = edge_index_all[:, mask]
     return edge_index
 
-def sort_edge(edge_index):
+def sort_edge(edge_index: Any) -> Any:
     """
     sort the target of edge to be sequential, which may increase computational efficiency later on when training
     :param edge_index:
@@ -158,7 +159,7 @@ def sort_edge(edge_index):
     return edge_index[:, arg_sort]
 
 
-def mol_to_edge_index(mol):
+def mol_to_edge_index(mol: Any) -> Any:
     """
     Calculate edge_index(bonding edge) from rdkit.mol
     :param mol:
@@ -175,7 +176,7 @@ def mol_to_edge_index(mol):
     return _edge_index
 
 
-def remove_bonding_edge(all_edge_index, bond_edge_index):
+def remove_bonding_edge(all_edge_index: Any, bond_edge_index: Any) -> Any:
     """
     Remove bonding idx_name from atom_edge_index to avoid double counting
     :param all_edge_index:
@@ -191,7 +192,7 @@ def remove_bonding_edge(all_edge_index, bond_edge_index):
     return all_edge_index[:, remain_mask]
 
 
-def extend_bond(edge_index):
+def extend_bond(edge_index: Any) -> Any:
     """
     extend bond edge to a next degree, i.e. consider all 1,3 interaction as bond
     :param edge_index:
@@ -222,8 +223,8 @@ def extend_bond(edge_index):
     return result
 
 
-def my_pre_transform(data, edge_version, do_sort_edge, cal_efg, cutoff, boundary_factor, use_center, mol,
-                     cal_3body_term, bond_atom_sep, record_long_range, type_3_body='B', extended_bond=False):
+def my_pre_transform(data: Any, edge_version: Any, do_sort_edge: Any, cal_efg: Any, cutoff: Any, boundary_factor: Any, use_center: Any, mol: Any,
+                     cal_3body_term: Any, bond_atom_sep: Any, record_long_range: Any, type_3_body: Any='B', extended_bond: Any=False) -> Any:
     """
     edge calculation
     atom_edge_index is non-bonding edge idx_name when bond_atom_sep=True; Otherwise, it is bonding and non-bonding together
@@ -313,7 +314,7 @@ def my_pre_transform(data, edge_version, do_sort_edge, cal_efg, cutoff, boundary
     return data
 
 
-def calc_data_for_predict(smi, num_confs=300):
+def calc_data_for_predict(smi: Any, num_confs: Any=300) -> Any:
     mol = get_low_energy_conf(smi, num_confs=num_confs)
     coords = get_coords(mol)
     elements = get_elements(mol)
